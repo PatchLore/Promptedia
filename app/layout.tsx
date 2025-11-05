@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -57,7 +58,9 @@ export default function RootLayout({
         <PostHogProvider>
           <ToastProvider>
             <Navbar />
-            <PostHogPageview />
+            <Suspense fallback={null}>
+              <PostHogPageview />
+            </Suspense>
             <main className="flex-grow">
               {children}
             </main>
