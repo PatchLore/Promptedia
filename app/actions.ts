@@ -100,12 +100,15 @@ export async function toggleFavorite(promptId: string) {
   }
 }
 
-export async function updatePrompt(id: string, fields: Partial<any>) {
+export async function updatePrompt(
+  id: string,
+  fields: Database['public']['Tables']['prompts']['Update']
+) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('prompts')
-    .update(fields)
+    .update(fields as Database['public']['Tables']['prompts']['Update'])
     .eq('id', id)
     .select()
     .single();
