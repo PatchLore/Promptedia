@@ -1,0 +1,94 @@
+title,prompt,category,type,tags,is_public,is_pro
+Cyberpunk Skyline,Create a glowing futuristic skyline at night, full of neon lights and rain-soaked reflections.,Art,image,"{cyberpunk,city,neon}",true,false
+Dream Forest,Generate an enchanted forest filled with soft mist, glowing mushrooms, and moonlight filtering through tall trees.,Art,image,"{fantasy,forest,dreamlike}",true,false
+Retro Futurism,Design an 80s-inspired futuristic poster with chrome typography and vaporwave colors.,Art,image,"{retro,vaporwave,poster}",true,false
+Surreal Desert Mirage,Visualize a surreal desert landscape with floating sand dunes and mirrored skies.,Art,image,"{surreal,desert,dream}",true,false
+Astral Garden,Create an interstellar garden where flowers bloom in zero gravity under starlight.,Art,image,"{space,floral,surreal}",true,false
+Neon Samurai,Illustrate a futuristic samurai standing beneath neon signs in a rainy alley.,Art,image,"{cyberpunk,samurai,neon}",true,false
+Glass Ocean,Render an ocean made of glass waves reflecting a burning sunset.,Art,image,"{ocean,glass,sunset}",true,false
+Floating Islands,Depict floating islands covered in waterfalls, vegetation, and ancient ruins.,Art,image,"{fantasy,landscape,sky}",true,false
+Cosmic Portrait,Paint a portrait made entirely of stars and galaxies swirling within human form.,Art,image,"{portrait,space,cosmos}",true,false
+Shadow Theater,Create a dimly lit stage with human shadows dancing independently of their owners.,Art,image,"{conceptual,shadows,drama}",true,false
+Golden Hour Street,Illustrate a quiet European street bathed in golden-hour sunlight.,Art,image,"{photorealistic,street,sunlight}",true,false
+Fractured Reality,Visualize a city skyline fragmented into floating shards of glass and light.,Art,image,"{abstract,city,conceptual}",true,false
+Minimalist Horizon,Design a clean minimalist landscape with soft gradients and abstract mountains.,Art,image,"{minimal,aesthetic,design}",true,false
+Ethereal Wings,Depict an angelic figure emerging from clouds of glowing mist.,Art,image,"{fantasy,ethereal,light}",true,false
+Solar Bloom,Show flowers blooming from the surface of the sun in abstract form.,Art,image,"{surreal,floral,light}",true,false
+Celestial Clock,Design a giant clock made of planets orbiting in synchronization.,Art,image,"{space,mechanical,symbolic}",true,false
+Urban Echoes,Capture reflections of city lights on wet pavement after rainfall.,Art,image,"{city,rain,reflection}",true,false
+Underwater Ruins,Illustrate ancient Greek temples submerged under crystal-clear water.,Art,image,"{underwater,ruins,mythology}",true,false
+Electric Jungle,Visualize a rainforest powered by glowing electric vines and robotic wildlife.,Art,image,"{sci-fi,nature,bioluminescent}",true,false
+Lunar Reflection,Depict a vast lake reflecting a giant glowing moon and drifting clouds.,Art,image,"{night,moon,reflection}",true,false
+Lofi Rainwalk,Generate a cozy lofi beat with rain ambience, gentle piano, and soft vinyl crackle.,Music,audio,"{lofi,relaxing,rain}",true,false
+Drum & Bass Uplift,Create an energetic melodic drum & bass track with uplifting synths and deep bass.,Music,audio,"{dnb,energetic,bass}",true,false
+Cinematic Pulse,Compose an epic cinematic track with pulsating drums and swelling strings.,Music,audio,"{cinematic,trailer,epic}",true,false
+Ambient Drift,Generate a long ambient drone with airy pads and cosmic textures.,Music,audio,"{ambient,drone,space}",true,false
+Synthwave Streets,Produce a retro synthwave track inspired by 80s arcade and neon highways.,Music,audio,"{synthwave,retro,neon}",true,false
+Deep House Flow,Make a smooth deep house groove with soulful vocals and warm bass.,Music,audio,"{house,dance,groove}",true,false
+Trance Horizon,Generate a euphoric trance melody with soaring leads and crisp percussion.,Music,audio,"{trance,uplifting,melody}",true,false
+Dark Techno Circuit,Design a hypnotic techno track with gritty bass and mechanical rhythm.,Music,audio,"{techno,dark,club}",true,false
+Jazz Lullaby,Compose a chill jazz instrumental with brushed drums and upright bass.,Music,audio,"{jazz,chill,instrumental}",true,false
+Ocean Echoes,Generate an ambient ocean-inspired track with waves, seagulls, and synth pads.,Music,audio,"{ambient,ocean,calm}",true,false
+Dubstep Shockwave,Create a high-impact dubstep track with aggressive wubs and metallic sound design.,Music,audio,"{dubstep,bass,energy}",true,false
+Lofi Guitar Sunset,Produce a sunset lofi track with nylon guitar and warm saturation.,Music,audio,"{lofi,guitar,chill}",true,false
+Drum Funk Motion,Generate a DnB track inspired by breakbeat funk grooves and filtered horns.,Music,audio,"{drum and bass,funk,groove}",true,false
+Space Chillout,Compose a relaxing space ambient piece with echoing synths and cosmic reverb.,Music,audio,"{ambient,space,relax}",true,false
+Minimal Pulse,Produce a minimal techno track with steady kick, glitch textures, and evolving pads.,Music,audio,"{techno,minimal,atmosphere}",true,false
+Future Garage Mood,Generate a future garage track with atmospheric vocals and shuffling percussion.,Music,audio,"{garage,future,mood}",true,false
+Loft Beats,Create jazzy hip-hop beats with upright bass, dusty drums, and sax samples.,Music,audio,"{lofi,jazz,hiphop}",true,false
+Ethereal Choir,Compose an ambient vocal pad track with layered human harmonies and reverb.,Music,audio,"{vocal,ambient,choir}",true,false
+Rainforest Percussion,Generate a tribal percussion track with natural ambience and rhythmic hand drums.,Music,audio,"{world,tribal,organic}",true,false
+Night Drive,Produce a driving late-night synthwave track for city drives.,Music,audio,"{synthwave,night,drive}",true,false
+Morning Haiku,Write a calming haiku about the first light of dawn breaking over quiet streets.,Writing,text,"{poetry,nature,minimal}",true,false
+AI Love Letter,Compose a love letter written by an AI trying to understand human emotion.,Writing,text,"{creative,ai,romance}",true,false
+Product Launch Email,Write an email announcing a new SaaS feature in an engaging and friendly tone.,Writing,text,"{marketing,email,product}",true,false
+Sci-Fi Journal Entry,Create a diary entry from the first human on Mars describing the red horizon.,Writing,text,"{sci-fi,journal,space}",true,false
+Short Horror Scene,Write a short horror scene set in a flickering subway station at midnight.,Writing,text,"{horror,fiction,scene}",true,false
+Poetic Brand Slogan,Generate a short poetic slogan for a sustainable coffee brand.,Writing,text,"{branding,poetic,eco}",true,false
+Futurist Manifesto,Draft a short manifesto envisioning a future where creativity is AI-powered.,Writing,text,"{manifesto,ai,future}",true,false
+Dream Interpretation,Explain a dream where the dreamer keeps finding locked doors in an endless hallway.,Writing,text,"{psychology,dreams,symbolism}",true,false
+Brand Story,Write a 200-word brand story for a handmade jewelry startup.,Writing,text,"{branding,storytelling,creative}",true,false
+Comedy Tweet,Write a viral comedic tweet about AI taking over your job but doing it better.,Writing,text,"{humor,social,tweet}",true,false
+Startup Elevator Pitch,Write a 30-second elevator pitch for a new AI productivity platform.,Business,text,"{startup,pitch,ai}",true,false
+Brand Mission Statement,Draft a concise mission statement for a sustainable fashion brand.,Business,text,"{branding,mission,eco}",true,false
+Social Media Strategy,Generate a weekly content strategy for a small business on Instagram.,Business,text,"{marketing,social,strategy}",true,false
+Customer Testimonial,Write a believable testimonial for a happy SaaS customer.,Business,text,"{marketing,review,copywriting}",true,false
+Lead Magnet Idea,Suggest 5 creative lead magnet ideas for an online course creator.,Business,text,"{marketing,leadgen,ideas}",true,false
+Product Tagline,Create a catchy tagline for a new AI design assistant.,Business,text,"{branding,tagline,creative}",true,false
+Cold Email Template,Write a friendly cold email offering web design services to a local business.,Business,text,"{sales,email,outreach}",true,false
+Pricing Table Copy,Write persuasive copy for a SaaS pricing table's plan descriptions.,Business,text,"{copywriting,pricing,saas}",true,false
+Customer Retention Email,Generate a re-engagement email for users who haven't logged in for 30 days.,Business,text,"{email,retention,engagement}",true,false
+Affiliate Pitch,Write a short persuasive paragraph inviting influencers to join your affiliate program.,Business,text,"{affiliate,influencer,marketing}",true,false
+Landing Page Headline,Create 5 high-converting headlines for an AI marketing tool homepage.,Business,text,"{copywriting,headline,saas}",true,false
+Investor Update,Draft a friendly investor update summarizing new features and growth metrics.,Business,text,"{investor,update,business}",true,false
+Upsell Script,Write a conversational upsell script for a customer support rep.,Business,text,"{sales,script,upsell}",true,false
+Business Slogan,Generate 10 slogan options for an eco-cleaning company.,Business,text,"{branding,slogan,eco}",true,false
+About Us Page Copy,Write a warm, authentic About page for a boutique creative agency.,Business,text,"{website,copywriting,about}",true,false
+Customer Onboarding Email,Write a welcome email guiding new users through setup steps.,Business,text,"{onboarding,email,saas}",true,false
+Event Promo Post,Write a short LinkedIn post promoting an upcoming product demo webinar.,Business,text,"{social,event,post}",true,false
+Business Plan Summary,Summarize a business plan for a new subscription coffee brand in under 150 words.,Business,text,"{summary,plan,business}",true,false
+Client Testimonial Request,Write a polite email asking a satisfied customer to leave a testimonial.,Business,text,"{email,testimonial,customer}",true,false
+Startup Name Generator,Create 10 catchy, brandable names for a fintech startup.,Business,text,"{naming,startup,fintech}",true,false
+Next.js Auth Guard,Write a middleware that redirects unauthenticated users to /login in a Next.js app.,Coding,text,"{nextjs,auth,middleware}",true,false
+Supabase Trigger Example,Create a SQL trigger that deducts credits when a new record is inserted.,Coding,text,"{supabase,sql,automation}",true,false
+Stripe Webhook Handler,Write a secure API route that verifies and handles Stripe webhook events.,Coding,text,"{stripe,api,node}",true,false
+Tailwind Theme Config,Show how to customize Tailwind colors and fonts in tailwind.config.js.,Coding,text,"{tailwind,design,config}",true,false
+React Context Example,Implement a global theme context with dark/light mode toggle.,Coding,text,"{react,context,theme}",true,false
+Supabase Auth Flow,Demonstrate sign-up and login flow using Supabase Auth in Next.js.,Coding,text,"{supabase,auth,nextjs}",true,false
+Prisma Relation Query,Write a Prisma query fetching all users with their related posts.,Coding,text,"{prisma,query,relation}",true,false
+Credit System Function,Implement a server function that deducts credits per API call.,Coding,text,"{backend,credits,function}",true,false
+File Upload API,Create a simple file upload endpoint using Next.js API routes.,Coding,text,"{api,upload,nextjs}",true,false
+Image Optimization,Show an example using Next/Image for responsive image optimization.,Coding,text,"{nextjs,image,performance}",true,false
+Database Migration,Write a SQL migration adding a new column to the prompts table.,Coding,text,"{sql,migration,database}",true,false
+Environment Variables,Explain how to securely access environment variables in Next.js 15.,Coding,text,"{nextjs,env,security}",true,false
+Edge Function Example,Show how to deploy a Supabase Edge Function for webhook handling.,Coding,text,"{supabase,edge,serverless}",true,false
+Unit Test Example,Write a Jest test for a function that calculates total cost with tax.,Coding,text,"{jest,test,node}",true,false
+API Rate Limiter,Implement a rate limiter using middleware in a Next.js API route.,Coding,text,"{api,security,rate-limit}",true,false
+Stripe Subscription Flow,Write code to create a new subscription via Stripe Checkout in Next.js.,Coding,text,"{stripe,checkout,nextjs}",true,false
+Responsive Navbar,Build a responsive Navbar with hamburger menu using Tailwind.,Coding,text,"{tailwind,ui,navbar}",true,false
+SEO Metadata Component,Create a reusable SEO component to set meta tags dynamically.,Coding,text,"{seo,react,component}",true,false
+Supabase Storage Upload,Demonstrate how to upload user avatars to Supabase storage.,Coding,text,"{supabase,storage,upload}",true,false
+Pagination Query,Write an SQL query or Supabase filter for pagination (limit & offset).,Coding,text,"{pagination,sql,query}",true,false
+
+
+
