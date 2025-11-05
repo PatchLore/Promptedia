@@ -100,15 +100,14 @@ export async function toggleFavorite(promptId: string) {
   }
 }
 
-export async function updatePrompt(
-  id: string,
-  fields: Database['public']['Tables']['prompts']['Update']
-) {
+type PromptUpdate = Database['public']['Tables']['prompts']['Update'];
+
+export async function updatePrompt(id: string, fields: PromptUpdate) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('prompts')
-    .update(fields as Database['public']['Tables']['prompts']['Update'])
+  const { data, error } = await (supabase
+    .from('prompts') as any)
+    .update(fields as PromptUpdate)
     .eq('id', id)
     .select()
     .single();
