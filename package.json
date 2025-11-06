@@ -15,6 +15,7 @@
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "@vercel/speed-insights": "^1.2.0",
     "autoprefixer": "^10.4.21",
     "csv-parse": "^6.1.0",
     "csv-stringify": "^6.6.0",
