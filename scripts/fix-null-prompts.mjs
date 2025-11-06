@@ -18,6 +18,7 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const DRY_RUN = process.argv.includes('--dry-run');
 const BUCKET = 'audio_previews';
 const DEFAULT_MODEL = 'bytedance/seedream-v4-text-to-image';
+const ENV_SYSTEM_USER_ID = process.env.SYSTEM_USER_ID || process.env.NEXT_PUBLIC_SYSTEM_USER_ID;
 
 if (!SUPABASE_URL || !SERVICE_KEY) {
   console.error('❌ Missing env: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
@@ -37,13 +38,25 @@ function slugify(str) {
     .replace(/^-+|-+$/g, '');
 }
 
+function isUuid(value) {
+  return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(
+    String(value || '')
+  );
+}
+
 async function getSystemUserId() {
+  // Prefer explicit env var if provided and valid
+  if (ENV_SYSTEM_USER_ID && isUuid(ENV_SYSTEM_USER_ID)) {
+    return ENV_SYSTEM_USER_ID;
+  }
+
   // Try fetch first profile id as system owner
   try {
     const { data, error } = await supabase.from('profiles').select('id').limit(1).maybeSingle();
-    if (!error && data?.id) return data.id;
+    if (!error && data?.id && isUuid(data.id)) return data.id;
   } catch {}
-  return 'system-admin';
+
+  return null; // no valid UUID available
 }
 
 async function fileExists(fileName) {
@@ -106,6 +119,7 @@ async function main() {
   let linkedPreviews = 0;
   let skippedPreview = 0;
   let simulatedChanges = 0;
+  let skippedUser = 0;
 
   for (const p of prompts) {
     const update = {};
@@ -113,7 +127,11 @@ async function main() {
       update.model = DEFAULT_MODEL;
     }
     if (!p.user_id) {
-      update.user_id = systemUserId;
+      if (systemUserId && isUuid(systemUserId)) {
+        update.user_id = systemUserId;
+      } else {
+        skippedUser++;
+      }
     }
     if (!p.audio_preview_url) {
       const preview = await tryFindPreviewForPrompt(p);
