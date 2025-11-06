@@ -13,12 +13,6 @@ export default function MusicPreviewSection({ audioUrl, promptText }: MusicPrevi
   if (audioUrl) {
     return (
       <div className="space-y-3">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">🎧</span>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Audio Preview
-          </label>
-        </div>
         <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
           {/* Debug: show current audio URL in dev */}
           {process.env.NODE_ENV === 'development' && (
@@ -33,15 +27,15 @@ export default function MusicPreviewSection({ audioUrl, promptText }: MusicPrevi
             Your browser does not support the audio element.
           </audio>
         </div>
-        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700">
-          <span>🔗 Linked App</span>
+        <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-200 dark:border-gray-700">
+          <span className="text-gray-600 dark:text-gray-400 font-medium">🔗 Linked App</span>
           <Link 
             href={soundswoopUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors font-medium flex items-center gap-1"
           >
-            powered by Soundswoop →
+            Try in Soundswoop →
           </Link>
         </div>
       </div>

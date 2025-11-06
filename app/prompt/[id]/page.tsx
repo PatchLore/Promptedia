@@ -56,6 +56,13 @@ export default async function PromptPage({ params }: Props) {
 
   const promptData = prompt as any;
 
+  // Detect if this is an audio/music prompt
+  const isAudioPrompt = 
+    promptData.type === 'audio' || 
+    promptData.type === 'music' || 
+    promptData.category === 'Music' ||
+    promptData.category === 'music';
+
   // Fetch affiliate for this category
   const affiliate = await pickAffiliateForCategoryServer(promptData.category);
 
@@ -197,11 +204,30 @@ export default async function PromptPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Example Result Section - handles all types including Music */}
-        {(promptData.example_url || promptData.category === 'Music' || promptData.type === 'audio' || promptData.type === 'music') && (
+        {/* Audio Preview Section - only for audio/music prompts */}
+        {isAudioPrompt && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+            <div className="mb-4">
+              <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
+                <span className="text-3xl">🎧</span>
+                Audio Preview
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Generated via Soundswoop / Mubert AI
+              </p>
+            </div>
+            <MusicPreviewSection 
+              audioUrl={promptData.audio_preview_url || promptData.audio_url || promptData.example_url}
+              promptText={promptData.prompt || ''}
+            />
+          </div>
+        )}
+
+        {/* Example Result Section - only for non-audio prompts */}
+        {!isAudioPrompt && promptData.example_url && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Example Result</h2>
-            {promptData.type === 'image' || (promptData.category !== 'Music' && promptData.type !== 'audio' && promptData.type !== 'music' && promptData.example_url) ? (
+            {promptData.type === 'image' || /^https?:/i.test(promptData.example_url || '') ? (
               <div className="relative w-full aspect-video rounded-lg overflow-hidden">
                 {/^https?:/i.test(promptData.example_url || '') ? (
                   <Image
@@ -221,11 +247,6 @@ export default async function PromptPage({ params }: Props) {
                   </div>
                 )}
               </div>
-            ) : (promptData.category === 'Music' || promptData.type === 'audio' || promptData.type === 'music') ? (
-              <MusicPreviewSection 
-                audioUrl={promptData.audio_preview_url || promptData.audio_url || promptData.example_url}
-                promptText={promptData.prompt || ''}
-              />
             ) : (
               <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                 <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
@@ -239,7 +260,8 @@ export default async function PromptPage({ params }: Props) {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Details</h2>
           <dl className="grid grid-cols-2 gap-4">
-            {promptData.model && (
+            {/* Only show Model for non-audio prompts */}
+            {!isAudioPrompt && promptData.model && (
               <>
                 <dt className="font-semibold">Model</dt>
                 <dd className="text-gray-600 dark:text-gray-400">{promptData.model}</dd>
