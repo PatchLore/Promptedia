@@ -9,10 +9,20 @@ export default function PostHogPageview() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY || '';
-    if (!key) return;
+    // Wait for PostHog to be loaded
+    if (!posthog.__loaded) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('⚠️ PostHog not loaded yet, skipping pageview');
+      }
+      return;
+    }
+
     const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
     posthog.capture('$pageview', { $current_url: url });
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 PostHog pageview captured:', url);
+    }
   }, [pathname, searchParams]);
 
   return null;

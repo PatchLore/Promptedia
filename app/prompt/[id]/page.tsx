@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import AffiliateCTA from '@/components/AffiliateCTA';
-import { pickAffiliateForCategory } from '@/lib/monetization';
+import { pickAffiliateForCategoryServer } from '@/lib/affiliate-server';
 import { CopyButton, FavoriteButton } from '@/components/PromptActions';
 import MusicPreviewSection from '@/components/MusicPreviewSection';
 import { Metadata } from 'next';
@@ -55,6 +55,9 @@ export default async function PromptPage({ params }: Props) {
   }
 
   const promptData = prompt as any;
+
+  // Fetch affiliate for this category
+  const affiliate = await pickAffiliateForCategoryServer(promptData.category);
 
   const {
     data: { user },
@@ -190,7 +193,7 @@ export default async function PromptPage({ params }: Props) {
           </p>
           {/* Upsell banner below description */}
           <div className="mt-4">
-            <AffiliateCTA tool={pickAffiliateForCategory(promptData.category)} meta={{ prompt_id: id }} />
+            <AffiliateCTA affiliate={affiliate} category={promptData.category} meta={{ prompt_id: id }} />
           </div>
         </div>
 

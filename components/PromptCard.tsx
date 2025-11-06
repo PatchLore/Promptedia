@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import AffiliateCTA from './AffiliateCTA';
-import { pickAffiliateForCategory } from '@/lib/monetization';
 
 type PromptCardProps = {
   prompt: any;
@@ -67,7 +66,7 @@ export default function PromptCard({ prompt }: PromptCardProps) {
               ))}
             </div>
           )}
-          <AffiliateCTA tool={pickAffiliateForCategory(prompt.category)} small meta={{ prompt_id: prompt.id }} />
+          <AffiliateCTA category={prompt.category} small meta={{ prompt_id: prompt.id }} />
           <div className="mt-auto" />
         </div>
       </div>
