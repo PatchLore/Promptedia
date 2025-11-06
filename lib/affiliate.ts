@@ -47,7 +47,8 @@ export async function pickAffiliateForCategory(
     }
 
     // Filter affiliates that match the category
-    const matchingAffiliates = affiliates.filter((affiliate) =>
+    // Type assertion needed because Supabase types may not be fully inferred
+    const matchingAffiliates = (affiliates as Affiliate[]).filter((affiliate) =>
       affiliate.category?.some((cat) => categoryLower.includes(cat.toLowerCase()))
     );
 
