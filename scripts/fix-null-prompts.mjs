@@ -15,6 +15,7 @@ dotenv.config({ path: '.env.local' });
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const DRY_RUN = process.argv.includes('--dry-run');
 const BUCKET = 'audio_previews';
 const DEFAULT_MODEL = 'bytedance/seedream-v4-text-to-image';
 
@@ -79,6 +80,9 @@ async function tryFindPreviewForPrompt(prompt) {
 
 async function main() {
   console.log('🔧 Fixing null fields in prompts...');
+  if (DRY_RUN) {
+    console.log('🧩 Dry-run mode ON (no database writes)');
+  }
 
   const systemUserId = await getSystemUserId();
 
@@ -101,6 +105,7 @@ async function main() {
   let updatedUser = 0;
   let linkedPreviews = 0;
   let skippedPreview = 0;
+  let simulatedChanges = 0;
 
   for (const p of prompts) {
     const update = {};
@@ -118,18 +123,37 @@ async function main() {
     }
 
     if (Object.keys(update).length > 0) {
-      const { error: upErr } = await supabase
-        .from('prompts')
-        .update(update)
-        .eq('id', p.id);
-      if (upErr) {
-        console.error(`❌ Update failed for ${p.id}:`, upErr.message);
+      if (DRY_RUN) {
+        simulatedChanges++;
+        const before = {
+          model: p.model || null,
+          user_id: p.user_id || null,
+          audio_preview_url: p.audio_preview_url || null,
+        };
+        const after = {
+          model: update.model ?? before.model,
+          user_id: update.user_id ?? before.user_id,
+          audio_preview_url: update.audio_preview_url ?? before.audio_preview_url,
+        };
+        console.log(
+          `🧩 Prompt ${JSON.stringify(p.title || p.id)} → would set model="${after.model}"` +
+            `${after.user_id !== before.user_id ? `, user_id="${after.user_id}"` : ''}` +
+            `${after.audio_preview_url && after.audio_preview_url !== before.audio_preview_url ? `, audio_preview_url="${after.audio_preview_url}"` : ''}`
+        );
       } else {
-        if (update.model) updatedModel++;
-        if (update.user_id) updatedUser++;
-        if (update.audio_preview_url) linkedPreviews++;
-        else if (!p.audio_preview_url) skippedPreview++;
-        console.log(`✅ Updated ${p.id} ${p.title ? `(${p.title})` : ''}`);
+        const { error: upErr } = await supabase
+          .from('prompts')
+          .update(update)
+          .eq('id', p.id);
+        if (upErr) {
+          console.error(`❌ Update failed for ${p.id}:`, upErr.message);
+        } else {
+          if (update.model) updatedModel++;
+          if (update.user_id) updatedUser++;
+          if (update.audio_preview_url) linkedPreviews++;
+          else if (!p.audio_preview_url) skippedPreview++;
+          console.log(`✅ Updated ${p.id} ${p.title ? `(${p.title})` : ''}`);
+        }
       }
     } else if (!p.audio_preview_url) {
       skippedPreview++;
@@ -141,6 +165,7 @@ async function main() {
   console.log(`✅ Updated ${updatedUser} prompts (user_id)`);
   console.log(`✅ Linked ${linkedPreviews} previews`);
   if (skippedPreview > 0) console.log(`⚠️ Skipped ${skippedPreview} (no match)`);
+  if (DRY_RUN) console.log(`🧩 ${simulatedChanges} simulated changes (dry-run)`);
 }
 
 main().catch((e) => {
