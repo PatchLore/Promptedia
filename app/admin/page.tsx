@@ -4,7 +4,7 @@ import Link from 'next/link';
 import AdminAuthCheck from '@/components/AdminAuthCheck';
 
 export const metadata = {
-  title: 'Admin Dashboard - Promptopedia',
+  title: 'Admin Dashboard - On Point Prompt',
   description: 'Manage prompts',
 };
 

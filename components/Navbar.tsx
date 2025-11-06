@@ -14,7 +14,7 @@ export default async function Navbar() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Promptopedia
+            On Point Prompt
           </Link>
           
           <div className="flex-1 max-w-md mx-8">

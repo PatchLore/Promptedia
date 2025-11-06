@@ -1,8 +1,8 @@
-# 🎧 Promptopedia ↔ Soundswoop Integration Plan
+# 🎧 On Point Prompt ↔ Soundswoop Integration Plan
 
 ## Overview
 
-Promptopedia hosts prompt metadata (title, category, tags, prompt text, image, optional audio_url).
+On Point Prompt hosts prompt metadata (title, category, tags, prompt text, image, optional audio_url).
 
 Soundswoop generates AI music tracks and stores them in Supabase with their own metadata.
 
@@ -27,15 +27,15 @@ The goal is to connect the two apps so each Music prompt can display or trigger 
 
 ## Phase 2 — Shared Audio Data
 
-- Add `audio_url` field in Promptopedia's `prompts` table (or use existing `example_url`).
+- Add `audio_url` field in On Point Prompt's `prompts` table (or use existing `example_url`).
 
-- When Soundswoop generates a track from a Promptopedia prompt:
+- When Soundswoop generates a track from an On Point Prompt prompt:
 
-  - It POSTs the audio_url and metadata back to Promptopedia API endpoint:
+  - It POSTs the audio_url and metadata back to On Point Prompt API endpoint:
 
     `/api/prompts/update-audio`
 
-  - Promptopedia updates `prompts.audio_url` (or `example_url`) and sets `has_preview = true` (optional flag).
+  - On Point Prompt updates `prompts.audio_url` (or `example_url`) and sets `has_preview = true` (optional flag).
 
 **Database Schema Addition:**
 ```sql
@@ -62,7 +62,7 @@ Response: { success: true }
 
 - Shared Supabase instance or linked `user_id` keys.
 
-- Users who generate on Soundswoop see their prompts synced to Promptopedia's "Created By" field.
+- Users who generate on Soundswoop see their prompts synced to On Point Prompt's "Created By" field.
 
 - Optional credit system: "Generate preview (costs 12 credits)".
 
@@ -76,13 +76,13 @@ Response: { success: true }
 
 ## Phase 4 — Cross-App Analytics & Recommendations
 
-- Track most generated music prompts in Soundswoop → highlight on Promptopedia's homepage.
+- Track most generated music prompts in Soundswoop → highlight on On Point Prompt's homepage.
 
 - Add "Top Trending Soundswoop Tracks" carousel.
 
 **Features:**
 - Analytics dashboard showing popular prompts
-- Trending section on Promptopedia homepage
+- Trending section on On Point Prompt homepage
 - Cross-app recommendations based on generation frequency
 - User engagement metrics
 
@@ -90,7 +90,7 @@ Response: { success: true }
 
 ## API Design Notes
 
-**Promptopedia endpoint:**
+**On Point Prompt endpoint:**
 
 ```
 POST /api/prompts/update-audio
@@ -114,7 +114,7 @@ Response: {
 ```
 
 **Soundswoop Callback:**
-- After generating audio, Soundswoop calls Promptopedia API
+- After generating audio, Soundswoop calls On Point Prompt API
 - Can use webhook or direct API call
 - Includes prompt text matching for linking
 
@@ -155,7 +155,7 @@ if (promptText && prompt.prompt !== promptText) {
 
 - One shared creative ecosystem:
 
-  **Promptopedia** → inspiration + prompt discovery  
+  **On Point Prompt** → inspiration + prompt discovery  
 
   **Soundswoop** → generation + playback  
 
@@ -180,7 +180,7 @@ if (promptText && prompt.prompt !== promptText) {
 - [ ] Add `audio_url` field to prompts table (or use `example_url`)
 - [ ] Create `/api/prompts/update-audio` endpoint
 - [ ] Implement validation and security
-- [ ] Update Soundswoop to call Promptopedia API after generation
+- [ ] Update Soundswoop to call On Point Prompt API after generation
 - [ ] Test audio playback on prompt detail page
 
 ### Phase 3 (Future)
@@ -220,7 +220,7 @@ if (promptText && prompt.prompt !== promptText) {
    - Test error handling
 
 3. **Integration Testing:**
-   - End-to-end flow: Promptopedia → Soundswoop → Audio generation → Back to Promptopedia
+   - End-to-end flow: On Point Prompt → Soundswoop → Audio generation → Back to On Point Prompt
    - User authentication sync
    - Credit system transactions
 

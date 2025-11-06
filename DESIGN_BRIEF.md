@@ -1,8 +1,8 @@
-# Promptopedia - Design Brief & Summary
+# On Point Prompt - Design Brief & Summary
 
 ## 🎯 App Overview
 
-**Promptopedia** is a searchable, filterable library of AI prompts for image generation, music creation, writing, business, and coding. Users can browse, search, save favorites, and submit their own prompts.
+**On Point Prompt** is a searchable, filterable library of AI prompts for image generation, music creation, writing, business, and coding. Users can browse, search, save favorites, and submit their own prompts.
 
 ---
 
@@ -13,7 +13,7 @@
 
 **Layout:**
 - Hero section with:
-  - App title/logo: "Promptopedia"
+  - App title/logo: "On Point Prompt"
   - Tagline: "Discover, search, and save AI prompts for image generation, music creation, writing, and more"
   - CTA buttons: "Browse Prompts" and "Submit Prompt"
 - Categories grid (5 categories):
@@ -133,7 +133,7 @@
 **Location:** Top of every page, sticky
 
 **Elements:**
-- Logo/Brand: "Promptopedia" (left)
+- Logo/Brand: "On Point Prompt" (left)
 - Search bar (center, max-width)
 - Navigation links:
   - Browse

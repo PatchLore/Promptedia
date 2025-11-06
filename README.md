@@ -1,4 +1,4 @@
-# Promptopedia
+# On Point Prompt
 
 A searchable, filterable library of AI prompts for image generation, music creation, writing, business, and more.
 

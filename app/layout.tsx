@@ -9,7 +9,7 @@ import PostHogProvider from '@/providers/PostHogProvider';
 import PostHogPageview from '@/components/PostHogPageview';
 
 export const metadata: Metadata = {
-  title: 'Promptopedia — Discover AI Prompts & Inspiration',
+  title: 'On Point Prompt — Discover AI Prompts & Inspiration',
   description:
     'Browse 100+ AI prompts for ChatGPT, Midjourney, and music generation. Search by category and discover inspiration daily.',
   keywords: ['AI prompts', 'prompt library', 'AI art', 'image generation', 'AI music', 'ChatGPT prompts', 'Midjourney prompts'],
@@ -17,24 +17,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: '/',
-    title: 'Promptopedia — Discover AI Prompts & Inspiration',
+    title: 'On Point Prompt — Discover AI Prompts & Inspiration',
     description:
       'Browse 100+ AI prompts for ChatGPT, Midjourney, and music generation. Search by category and discover inspiration daily.',
-    siteName: 'Promptopedia',
+    siteName: 'On Point Prompt',
     images: [
       {
         url: '/og.png',
         width: 1200,
         height: 630,
-        alt: 'Promptopedia',
+        alt: 'On Point Prompt',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@promptopedia',
-    creator: '@promptopedia',
-    title: 'Promptopedia — Discover AI Prompts & Inspiration',
+    site: '@onpointprompt',
+    creator: '@onpointprompt',
+    title: 'On Point Prompt — Discover AI Prompts & Inspiration',
     description:
       'Browse 100+ AI prompts for ChatGPT, Midjourney, and music generation. Search by category and discover inspiration daily.',
     images: ['/og.png'],

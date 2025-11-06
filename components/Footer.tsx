@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">Promptopedia</h3>
+            <h3 className="font-bold text-lg mb-4">On Point Prompt</h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
               Your library of AI prompts for image generation, music creation, writing, and more.
             </p>
@@ -39,7 +39,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
-          © {new Date().getFullYear()} Promptopedia. All rights reserved.
+          © {new Date().getFullYear()} On Point Prompt. All rights reserved.
         </div>
       </div>
     </footer>

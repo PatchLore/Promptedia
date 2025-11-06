@@ -3,7 +3,7 @@ import PackCard from '@/components/PackCard';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Prompt Packs — Promptopedia',
+  title: 'Prompt Packs — On Point Prompt',
   description: 'Curated digital downloads of themed AI prompts for creators, musicians, and artists.',
 };
 

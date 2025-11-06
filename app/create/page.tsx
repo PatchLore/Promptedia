@@ -3,8 +3,8 @@ import { redirect } from 'next/navigation';
 import CreatePromptForm from '@/components/CreatePromptForm';
 
 export const metadata = {
-  title: 'Create Prompt - Promptopedia',
-  description: 'Submit a new AI prompt to the Promptopedia library',
+  title: 'Create Prompt - On Point Prompt',
+  description: 'Submit a new AI prompt to the On Point Prompt library',
 };
 
 export default async function CreatePage() {

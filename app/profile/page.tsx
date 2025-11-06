@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import PromptGrid from '@/components/PromptGrid';
 
 export const metadata = {
-  title: 'My Favorites - Promptopedia',
+  title: 'My Favorites - On Point Prompt',
   description: 'View your saved favorite prompts',
 };
 

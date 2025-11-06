@@ -30,8 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const promptData = prompt as any;
 
   return {
-    title: `${promptData.title || 'Prompt'} - Promptopedia`,
-    description: promptData.prompt?.substring(0, 160) || 'AI prompt from Promptopedia',
+    title: `${promptData.title || 'Prompt'} - On Point Prompt`,
+    description: promptData.prompt?.substring(0, 160) || 'AI prompt from On Point Prompt',
     openGraph: {
       title: promptData.title || 'Prompt',
       description: promptData.prompt?.substring(0, 160) || '',
@@ -90,7 +90,7 @@ export default async function PromptPage({ params }: Props) {
     description: promptData.prompt || '',
     creator: {
       '@type': 'Person',
-      name: 'Promptopedia Community',
+      name: 'On Point Prompt Community',
     },
     dateCreated: promptData.created_at,
     keywords: promptData.tags?.join(', ') || promptData.category || '',

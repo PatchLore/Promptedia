@@ -1,6 +1,6 @@
 # 🗄️ Supabase Consolidation Guide — Moving Multiple Projects Into One
 
-This doc explains how to migrate (and eventually consolidate) multiple Supabase projects into a single project/account — ideal for unifying Promptopedia, Soundswoop, Dreamify, etc.
+This doc explains how to migrate (and eventually consolidate) multiple Supabase projects into a single project/account — ideal for unifying On Point Prompt, Soundswoop, Dreamify, etc.
 
 ---
 

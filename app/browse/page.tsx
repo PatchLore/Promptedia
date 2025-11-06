@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Browse Prompts - Promptopedia',
+  title: 'Browse Prompts - On Point Prompt',
   description: 'Search and filter AI prompts by category, type, and keywords',
 };
 

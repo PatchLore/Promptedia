@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Backfill null fields in prompts:
- * - model → "bytedance/seedream-v4-text-to-image"
+ * - model → "Leonardo.Ai"
  * - user_id → first profile id (if available) else "system-admin"
  * - audio_preview_url → try to link file in bucket audio_previews by slug or id
  *
@@ -17,7 +17,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const DRY_RUN = process.argv.includes('--dry-run');
 const BUCKET = 'audio_previews';
-const DEFAULT_MODEL = 'bytedance/seedream-v4-text-to-image';
+const DEFAULT_MODEL = 'Leonardo.Ai';
 const ENV_SYSTEM_USER_ID = process.env.SYSTEM_USER_ID || process.env.NEXT_PUBLIC_SYSTEM_USER_ID;
 
 if (!SUPABASE_URL || !SERVICE_KEY) {

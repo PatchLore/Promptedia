@@ -1,4 +1,4 @@
--- Promptopedia Database Schema
+-- On Point Prompt Database Schema
 
 -- prompts table
 create table prompts (

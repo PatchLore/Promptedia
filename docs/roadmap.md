@@ -1,8 +1,8 @@
-# 🚀 Promptopedia — Vision & Development Roadmap
+# 🚀 On Point Prompt — Vision & Development Roadmap
 
 ## 🌍 Overview
 
-Promptopedia is an evolving creative AI library — a living encyclopedia of prompts across multiple disciplines (Art, Music, Writing, Coding, and Business).  
+On Point Prompt is an evolving creative AI library — a living encyclopedia of prompts across multiple disciplines (Art, Music, Writing, Coding, and Business).  
 
 Its mission is to become the ultimate **creative discovery hub** — where users can explore, generate, and share ideas through prompts that spark imagination across text, image, audio, and code.
 
@@ -20,11 +20,11 @@ The long-term vision is to unify all creative AI experiences under one ecosystem
 
 
 
-Promptopedia bridges inspiration and generation.  
+On Point Prompt bridges inspiration and generation.  
 
 Each category serves as a starting point for creativity:
 
-- **Art** → visual imagination (Seedream / Kie.ai)
+- **Art** → visual imagination (Leonardo.Ai / Kie.ai)
 
 - **Music** → sonic inspiration (Soundswoop)
 
@@ -134,13 +134,13 @@ Optional expansion into:
 
 ## 🧠 Long-Term Vision (v3.0+)
 
-Promptopedia becomes the **Creative Operating System** for AI makers.
+On Point Prompt becomes the **Creative Operating System** for AI makers.
 
 
 
 ### Future directions:
 
-- Unified authentication across all creative apps (Promptopedia, Soundswoop, Dreamify)
+- Unified authentication across all creative apps (On Point Prompt, Soundswoop, Dreamify)
 
 - Real-time "Run Prompt" generation directly in-app
 
@@ -182,7 +182,7 @@ Optional AI integrations:
 
 - Suno / Riffusion (music previews)
 
-- Seedream v4 (visual art generation)
+- Leonardo.Ai (visual art generation)
 
 
 
@@ -190,7 +190,7 @@ Optional AI integrations:
 
 ## 🪄 Strategic Ecosystem
 
-Promptopedia acts as the discovery layer.  
+On Point Prompt acts as the discovery layer.  
 
 Soundswoop acts as the generation layer.  
 
@@ -228,7 +228,7 @@ Together they form a **creative AI network** powered by shared Supabase infrastr
 
 ## 🏁 Conclusion
 
-Promptopedia is not just a prompt library — it's the **creative engine of your ecosystem**.  
+On Point Prompt is not just a prompt library — it's the **creative engine of your ecosystem**.  
 
 A hub for discovery, education, and generation — designed to inspire creators and link directly into tools like Soundswoop.  
 
