@@ -20,10 +20,16 @@ export default function MusicPreviewSection({ audioUrl, promptText }: MusicPrevi
           </label>
         </div>
         <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-          <audio controls className="w-full">
-            <source src={audioUrl} type="audio/mpeg" />
-            <source src={audioUrl} type="audio/mp3" />
-            <source src={audioUrl} type="audio/wav" />
+          {/* Debug: show current audio URL in dev */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-2 text-xs text-gray-500 break-all">Audio preview: {audioUrl}</div>
+          )}
+          <audio
+            controls
+            preload="none"
+            className="w-full"
+            src={audioUrl}
+          >
             Your browser does not support the audio element.
           </audio>
         </div>

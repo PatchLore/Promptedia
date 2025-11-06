@@ -223,7 +223,7 @@ export default async function PromptPage({ params }: Props) {
               </div>
             ) : (promptData.category === 'Music' || promptData.type === 'audio' || promptData.type === 'music') ? (
               <MusicPreviewSection 
-                audioUrl={promptData.audio_url || promptData.example_url}
+                audioUrl={promptData.audio_preview_url || promptData.audio_url || promptData.example_url}
                 promptText={promptData.prompt || ''}
               />
             ) : (
