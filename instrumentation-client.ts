@@ -17,8 +17,6 @@ if (!posthogKey || posthogKey === '' || posthogKey === 'phc_xxx') {
         console.log('✅ PostHog initialized via instrumentation', { host: posthogHost })
       }
     },
-    // Add error handling
-    loaded_as_module: true,
   })
 }
 
