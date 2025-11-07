@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     'Browse 100+ AI prompts for ChatGPT, Midjourney, and music generation. Search by category and discover inspiration daily.',
   keywords: ['AI prompts', 'prompt library', 'AI art', 'image generation', 'AI music', 'ChatGPT prompts', 'Midjourney prompts'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com'),
   openGraph: {
     type: 'website',
     url: '/',

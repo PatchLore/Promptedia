@@ -2,14 +2,14 @@
 
 ## Current Configuration
 
-Your PostHog is configured for self-hosting at `https://posthog.promptopedia.com`, but the DNS subdomain is not set up yet.
+Your PostHog is configured for self-hosting at `https://posthog.onpointprompt.com`, but the DNS subdomain is not set up yet.
 
 ## Options
 
 ### Option 1: Set Up DNS (Recommended for Self-Hosting)
 
 1. **Add DNS Record**:
-   - Go to your DNS provider (where `promptopedia.com` is hosted)
+   - Go to your DNS provider (where `onpointprompt.com` is hosted)
    - Add a CNAME or A record:
      - **Type**: CNAME
      - **Name**: `posthog`
@@ -19,7 +19,7 @@ Your PostHog is configured for self-hosting at `https://posthog.promptopedia.com
 
 3. **Verify**:
    ```bash
-   nslookup posthog.promptopedia.com
+   nslookup posthog.onpointprompt.com
    ```
 
 ### Option 2: Use PostHog Cloud (Quick Setup)
@@ -52,7 +52,7 @@ If you want to disable PostHog until DNS is configured:
 1. Remove or comment out PostHog in `.env.local`:
    ```bash
    # NEXT_PUBLIC_POSTHOG_KEY=phc_xxx
-   # NEXT_PUBLIC_POSTHOG_HOST=https://posthog.promptopedia.com
+   # NEXT_PUBLIC_POSTHOG_HOST=https://posthog.onpointprompt.com
    ```
 
 2. The app will continue to work, just without analytics tracking.

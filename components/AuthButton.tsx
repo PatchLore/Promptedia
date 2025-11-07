@@ -13,20 +13,6 @@ export default function AuthButton({ user }: AuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createClient();
 
-  const handleSignIn = async () => {
-    setIsLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    if (error) {
-      console.error('Sign in error:', error);
-    }
-    setIsLoading(false);
-  };
-
   const handleSignOut = async () => {
     setIsLoading(true);
     await supabase.auth.signOut();
@@ -34,25 +20,14 @@ export default function AuthButton({ user }: AuthButtonProps) {
     setIsLoading(false);
   };
 
-  if (user) {
-    return (
-      <button
-        onClick={handleSignOut}
-        disabled={isLoading}
-        className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm"
-      >
-        {isLoading ? 'Signing out...' : 'Sign Out'}
-      </button>
-    );
-  }
-
+  // This component is only used when user is authenticated (from Navbar)
   return (
     <button
-      onClick={handleSignIn}
+      onClick={handleSignOut}
       disabled={isLoading}
-      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm"
     >
-      {isLoading ? 'Signing in...' : 'Sign In'}
+      {isLoading ? 'Signing out...' : 'Sign Out'}
     </button>
   );
 }

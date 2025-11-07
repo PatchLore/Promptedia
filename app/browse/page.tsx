@@ -32,7 +32,7 @@ export default async function BrowsePage({
   ]);
   const search = params.search || '';
   const category = params.category || 'all';
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
 
   // Build the base query
   let query = supabase

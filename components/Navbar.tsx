@@ -29,10 +29,10 @@ export default async function Navbar() {
               Browse
             </Link>
             <Link
-              href="/create"
+              href="/packs"
               className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
-              Create
+              Packs
             </Link>
             {user && (
               <Link
@@ -42,7 +42,16 @@ export default async function Navbar() {
                 Favorites
               </Link>
             )}
-            <AuthButton user={user} />
+            {user ? (
+              <AuthButton user={user} />
+            ) : (
+              <Link
+                href="/sign-in"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       </div>

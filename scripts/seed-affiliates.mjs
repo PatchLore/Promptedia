@@ -29,7 +29,7 @@ const affiliates = [
   {
     name: 'Webflow',
     category: ['business', 'coding'],
-    affiliate_url: 'https://webflow.grsm.io/promptopedia',
+    affiliate_url: 'https://webflow.grsm.io/onpointprompt',
     commission_value: 50,
     commission_type: 'revshare',
     cookie_days: 90,
@@ -37,7 +37,7 @@ const affiliates = [
   {
     name: 'Framer',
     category: ['business', 'coding'],
-    affiliate_url: 'https://framer.com/?ref=promptopedia',
+    affiliate_url: 'https://framer.com/?ref=onpointprompt',
     commission_value: 50,
     commission_type: 'revshare',
     cookie_days: 60,
@@ -45,7 +45,7 @@ const affiliates = [
   {
     name: 'Mixo AI',
     category: ['business', 'coding'],
-    affiliate_url: 'https://mixo.io/?via=promptopedia',
+    affiliate_url: 'https://mixo.io/?via=onpointprompt',
     commission_value: 20,
     commission_type: 'revshare',
     cookie_days: 90,
@@ -53,7 +53,7 @@ const affiliates = [
   {
     name: 'Copy.ai',
     category: ['writing', 'business'],
-    affiliate_url: 'https://copy.ai/?via=promptopedia',
+    affiliate_url: 'https://copy.ai/?via=onpointprompt',
     commission_value: 45,
     commission_type: 'revshare',
     cookie_days: 90,
@@ -61,7 +61,7 @@ const affiliates = [
   {
     name: 'Jasper',
     category: ['writing'],
-    affiliate_url: 'https://jasper.ai/?via=promptopedia',
+    affiliate_url: 'https://jasper.ai/?via=onpointprompt',
     commission_value: 30,
     commission_type: 'revshare',
     cookie_days: 60,
@@ -69,7 +69,7 @@ const affiliates = [
   {
     name: 'Notion',
     category: ['writing', 'business'],
-    affiliate_url: 'https://notion.so/?ref=promptopedia',
+    affiliate_url: 'https://notion.so/?ref=onpointprompt',
     commission_value: 20,
     commission_type: 'revshare',
     cookie_days: 90,
@@ -77,7 +77,7 @@ const affiliates = [
   {
     name: 'Leonardo.ai',
     category: ['art'],
-    affiliate_url: 'https://leonardo.ai/?via=promptopedia',
+    affiliate_url: 'https://leonardo.ai/?via=onpointprompt',
     commission_value: 60,
     commission_type: 'revshare',
     cookie_days: 30,
@@ -85,7 +85,7 @@ const affiliates = [
   {
     name: 'Imagine.art',
     category: ['art'],
-    affiliate_url: 'https://imagine.art/?ref=promptopedia',
+    affiliate_url: 'https://imagine.art/?ref=onpointprompt',
     commission_value: 50,
     commission_type: 'revshare',
     cookie_days: 60,
@@ -101,7 +101,7 @@ const affiliates = [
   {
     name: 'Mubert',
     category: ['music'],
-    affiliate_url: 'https://mubert.com/?ref=promptopedia',
+    affiliate_url: 'https://mubert.com/?ref=onpointprompt',
     commission_value: 30,
     commission_type: 'revshare',
     cookie_days: 60,
@@ -109,7 +109,7 @@ const affiliates = [
   {
     name: 'SOUNDRAW',
     category: ['music'],
-    affiliate_url: 'https://soundraw.io/?via=promptopedia',
+    affiliate_url: 'https://soundraw.io/?via=onpointprompt',
     commission_value: 25,
     commission_type: 'cpa',
     cookie_days: 30,

@@ -109,7 +109,7 @@ Insert directly into Supabase or use the seed script pattern:
 
 ```sql
 INSERT INTO affiliates (name, category, affiliate_url, commission_value, commission_type, cookie_days, is_active)
-VALUES ('New Tool', ARRAY['art', 'design'], 'https://newtool.com/?ref=promptopedia', 40, 'revshare', 90, true);
+VALUES ('New Tool', ARRAY['art', 'design'], 'https://newtool.com/?ref=onpointprompt', 40, 'revshare', 90, true);
 ```
 
 ### Updating Affiliates
@@ -140,7 +140,7 @@ Test affiliate selection for each category:
 Future improvements could include:
 
 - **Caching**: Cache affiliate results to reduce Supabase calls
-- **UTM Parameters**: Add `?utm_source=promptopedia&utm_medium=affiliate&utm_campaign={category}`
+- **UTM Parameters**: Add `?utm_source=onpointprompt&utm_medium=affiliate&utm_campaign={category}`
 - **Admin Dashboard**: Add affiliate management UI in `/admin`
 - **Commission Display**: Show commission rates on affiliate cards for transparency
 - **A/B Testing**: Rotate between top affiliates for testing

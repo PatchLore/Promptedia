@@ -72,7 +72,7 @@ export function getDefaultAffiliate(): Affiliate {
     id: 'default',
     name: 'Mixo AI',
     category: ['business', 'coding'],
-    affiliate_url: 'https://mixo.io/?via=promptopedia',
+    affiliate_url: 'https://mixo.io/?via=onpointprompt',
     commission_value: 20,
     commission_type: 'revshare',
     cookie_days: 90,
