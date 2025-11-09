@@ -93,6 +93,7 @@ export type Database = {
           prompt: string | null
           slug: string | null
           tags: string[] | null
+          thumbnail_url: string | null
           title: string | null
           type: string | null
           user_id: string | null
@@ -110,6 +111,7 @@ export type Database = {
           prompt?: string | null
           slug?: string | null
           tags?: string[] | null
+          thumbnail_url?: string | null
           title?: string | null
           type?: string | null
           user_id?: string | null
@@ -127,6 +129,7 @@ export type Database = {
           prompt?: string | null
           slug?: string | null
           tags?: string[] | null
+          thumbnail_url?: string | null
           title?: string | null
           type?: string | null
           user_id?: string | null
