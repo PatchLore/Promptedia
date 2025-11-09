@@ -39,13 +39,16 @@ export const metadata: Metadata = {
       'Browse 100+ AI prompts for ChatGPT, Midjourney, and music generation. Search by category and discover inspiration daily.',
     images: ['/og.png'],
   },
+  alternates: {
+    canonical: '/',
+  },
+};
+
+export const viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
   ],
-  alternates: {
-    canonical: '/',
-  },
 };
 
 export default function RootLayout({
