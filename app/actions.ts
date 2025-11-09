@@ -28,7 +28,7 @@ async function generateUniqueSlug(
 
   while (attempt < 5) {
     const result = await supabase
-      .from<PromptRecord>('prompts')
+      .from('prompts')
       .select('id, slug')
       .eq('slug', candidate)
       .maybeSingle<PromptRecord>();
@@ -100,7 +100,7 @@ export async function createPrompt(data: {
   };
 
   const { data: inserted, error: insertError } = await supabase
-    .from<PromptRecord>('prompts')
+    .from('prompts')
     .insert([insertData] as any)
     .select()
     .single<PromptRecord>();
@@ -148,7 +148,7 @@ export async function toggleFavorite(promptId: string) {
     }
 
     const { data: promptMeta } = await supabase
-      .from<PromptRecord>('prompts')
+      .from('prompts')
       .select('id, slug')
       .eq('id', promptId)
       .maybeSingle<PromptRecord>();
@@ -170,7 +170,7 @@ export async function toggleFavorite(promptId: string) {
     }
 
     const { data: promptMeta } = await supabase
-      .from<PromptRecord>('prompts')
+      .from('prompts')
       .select('id, slug')
       .eq('id', promptId)
       .maybeSingle<PromptRecord>();
@@ -187,7 +187,7 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
   const supabase = await createClient();
 
   const { data: existingPrompt } = await supabase
-    .from<PromptRecord>('prompts')
+    .from('prompts')
     .select('id, slug')
     .eq('id', id)
     .maybeSingle<PromptRecord>();
@@ -215,7 +215,7 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
   }
 
   const { data: updated, error: updateError } = await supabase
-    .from<PromptRecord>('prompts')
+    .from('prompts')
     .update(updatePayload as PromptUpdate)
     .eq('id', id)
     .select()
