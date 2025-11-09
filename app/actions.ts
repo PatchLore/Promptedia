@@ -7,6 +7,7 @@ import { Database } from '@/lib/supabase/types';
 import { buildPromptPath, isValidSlug, slugifyTitle } from '@/lib/slug';
 
 type PromptInsert = Database['public']['Tables']['prompts']['Insert'];
+type PromptRecord = { id?: string; slug?: string | null; [key: string]: any };
 
 async function generateUniqueSlug(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -20,11 +21,14 @@ async function generateUniqueSlug(
   let attempt = 0;
 
   while (attempt < 5) {
-    const { data: existing, error } = await supabase
+    const result = await supabase
       .from('prompts')
       .select('id')
       .eq('slug', candidate)
-      .maybeSingle();
+      .maybeSingle<PromptRecord>();
+
+    const existing: PromptRecord | null = result?.data ?? null;
+    const error = result?.error;
 
     if (error) {
       if (process.env.NODE_ENV === 'development') {
@@ -139,7 +143,7 @@ export async function toggleFavorite(promptId: string) {
       .from('prompts')
       .select('slug')
       .eq('id', promptId)
-      .maybeSingle();
+      .maybeSingle<PromptRecord>();
 
     revalidatePath('/profile');
     revalidatePromptPaths(promptMeta?.slug, promptId);
@@ -161,7 +165,7 @@ export async function toggleFavorite(promptId: string) {
       .from('prompts')
       .select('slug')
       .eq('id', promptId)
-      .maybeSingle();
+      .maybeSingle<PromptRecord>();
 
     revalidatePath('/profile');
     revalidatePromptPaths(promptMeta?.slug, promptId);
@@ -178,9 +182,9 @@ export async function updatePrompt(id: string, fields: PromptUpdate) {
     .from('prompts')
     .select('slug')
     .eq('id', id)
-    .maybeSingle();
+    .maybeSingle<PromptRecord>();
 
-  const previousSlug = existingPrompt?.slug || null;
+  const previousSlug = existingPrompt?.slug ?? null;
 
   let updatePayload = { ...fields };
 

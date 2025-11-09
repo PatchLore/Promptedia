@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 
+type PromptRecord = { id?: string; slug?: string | null; [key: string]: any };
+
 export default async function LegacyPromptRedirect({
   params,
 }: {
@@ -12,9 +14,9 @@ export default async function LegacyPromptRedirect({
     .from('prompts')
     .select('slug')
     .eq('id', params.id)
-    .single();
+    .single<PromptRecord>();
 
-  if (error || !data || !data.slug) {
+  if (error || !data?.slug) {
     redirect('/prompts');
   }
 
