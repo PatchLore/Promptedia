@@ -3,11 +3,6 @@ import AdminTable from '@/components/AdminTable';
 import Link from 'next/link';
 import AdminAuthCheck from '@/components/AdminAuthCheck';
 
-export const metadata = {
-  title: 'Admin Dashboard - On Point Prompt',
-  description: 'Manage prompts',
-};
-
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
