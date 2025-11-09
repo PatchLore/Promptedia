@@ -1,24 +1,10 @@
-'use client';
-
 import Link from 'next/link';
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 
 export const viewport = {
   themeColor: '#000000',
 };
 
 export default function NotFound() {
-  return (
-    <Suspense fallback={<div className="text-white p-6">Loading…</div>}>
-      <NotFoundInner />
-    </Suspense>
-  );
-}
-
-function NotFoundInner() {
-  const params = useSearchParams();
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-8 text-center">
       <h1 className="text-5xl font-bold mb-4">Page Not Found</h1>
