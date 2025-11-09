@@ -3,10 +3,7 @@ export const dynamic = 'force-dynamic';
 import { supabase } from '@/lib/supabase/client';
 import PromptGrid from '@/components/PromptGrid';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { ToastProvider } from '@/components/ToastProvider';
-import PostHogProvider from '@/providers/PostHogProvider';
+import WrapperClient from '@/app/WrapperClient';
 
 const categories = [
   { name: 'Art', slug: 'art', icon: '🎨' },
@@ -81,17 +78,7 @@ export default async function HomePage() {
     </div>
   );
 
-  return (
-    <PostHogProvider>
-      <ToastProvider>
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-          <main className="flex-1">{content}</main>
-          <Footer />
-        </div>
-      </ToastProvider>
-    </PostHogProvider>
-  );
+  return <WrapperClient>{content}</WrapperClient>;
 }
 
 

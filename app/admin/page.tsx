@@ -2,6 +2,7 @@ import { supabase, PromptRow } from '@/lib/supabase/client';
 import AdminTable from '@/components/AdminTable';
 import Link from 'next/link';
 import AdminAuthCheck from '@/components/AdminAuthCheck';
+import WrapperClient from '@/app/WrapperClient';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,7 @@ export default async function AdminPage() {
     console.error('Error fetching prompts:', error);
   }
 
-  return (
+  const content = (
     <AdminAuthCheck>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -41,4 +42,6 @@ export default async function AdminPage() {
       </div>
     </AdminAuthCheck>
   );
+
+  return <WrapperClient>{content}</WrapperClient>;
 }

@@ -2,10 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { ToastProvider } from '@/components/ToastProvider';
-import PostHogProvider from '@/providers/PostHogProvider';
+import WrapperClient from '@/app/WrapperClient';
 
 export default async function PromptsPage({
   searchParams,
@@ -32,25 +29,13 @@ export default async function PromptsPage({
 
   const { data: prompts, error } = await query;
 
-  const wrapContent = (content: any) => (
-    <PostHogProvider>
-      <ToastProvider>
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-          <main className="flex-1">{content}</main>
-          <Footer />
-        </div>
-      </ToastProvider>
-    </PostHogProvider>
-  );
-
   if (error) {
     console.error('Error fetching prompts:', error);
-    return wrapContent(<div className="container mx-auto px-4 py-10">Error loading prompts.</div>);
+    return <WrapperClient><div className="container mx-auto px-4 py-10">Error loading prompts.</div></WrapperClient>;
   }
 
   if (!prompts?.length) {
-    return wrapContent(<div className="container mx-auto px-4 py-10">No prompts found.</div>);
+    return <WrapperClient><div className="container mx-auto px-4 py-10">No prompts found.</div></WrapperClient>;
   }
 
   const content = (
@@ -121,6 +106,6 @@ export default async function PromptsPage({
     </div>
   );
 
-  return wrapContent(content);
+  return <WrapperClient>{content}</WrapperClient>;
 }
 

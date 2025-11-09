@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import WrapperClient from '@/app/WrapperClient';
 
 type PromptRecord = { id?: string; slug?: string | null; [key: string]: any };
 
@@ -19,4 +20,6 @@ export default async function LegacyPromptRedirect({
   }
 
   redirect(`/prompts/${data.slug}`);
+
+  return <WrapperClient>{null}</WrapperClient>;
 }

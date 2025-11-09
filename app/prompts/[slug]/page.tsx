@@ -1,5 +1,6 @@
 import { supabase, PromptRow } from '@/lib/supabase/client';
 import { notFound } from 'next/navigation';
+import WrapperClient from '@/app/WrapperClient';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   return {
@@ -22,7 +23,7 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
     notFound();
   }
 
-  return (
+  const content = (
     <div className="max-w-3xl mx-auto py-12 px-6">
       <h1 className="text-4xl font-bold mb-6 text-white">{prompt.title}</h1>
 
@@ -51,4 +52,6 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
       </div>
     </div>
   );
+
+  return <WrapperClient>{content}</WrapperClient>;
 }
