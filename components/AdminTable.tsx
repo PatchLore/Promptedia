@@ -392,12 +392,16 @@ export default function AdminTable({ prompts: initialPrompts }: AdminTableProps)
                   <div className="flex items-center gap-2">
                     <label className="text-xs text-gray-500 dark:text-gray-400">Public:</label>
                     {isEditing ? (
-                      <input
-                        type="checkbox"
-                        checked={editingFields.is_public !== undefined ? editingFields.is_public : prompt.is_public}
-                        onChange={(e) => setEditingFields({ ...editingFields, is_public: e.target.checked })}
-                        className="w-4 h-4"
-                      />
+                    <input
+                      type="checkbox"
+                      checked={
+                        editingFields.is_public !== undefined
+                          ? Boolean(editingFields.is_public)
+                          : Boolean(prompt.is_public)
+                      }
+                      onChange={(e) => setEditingFields({ ...editingFields, is_public: e.target.checked })}
+                      className="w-4 h-4"
+                    />
                     ) : (
                       <span className={prompt.is_public ? 'text-green-600' : 'text-gray-400'}>
                         {prompt.is_public ? '✓ Yes' : '✗ No'}
