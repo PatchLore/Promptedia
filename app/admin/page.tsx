@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/client';
+import { supabase, PromptRow } from '@/lib/supabase/client';
 import AdminTable from '@/components/AdminTable';
 import Link from 'next/link';
 import AdminAuthCheck from '@/components/AdminAuthCheck';
@@ -41,7 +41,7 @@ export default async function AdminPage() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-          <AdminTable prompts={prompts || []} />
+          <AdminTable prompts={(prompts as PromptRow[]) || []} />
         </div>
       </div>
     </AdminAuthCheck>

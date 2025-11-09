@@ -5,32 +5,20 @@ import { updatePrompt, deletePrompt } from '@/app/actions';
 import { useToast } from './ToastProvider';
 import Image from 'next/image';
 import UnsplashImageButton from './UnsplashImageButton';
-
-type Prompt = {
-  id: string;
-  title: string | null;
-  category: string | null;
-  type: string | null;
-  example_url: string | null;
-  is_pro: boolean;
-  is_public: boolean;
-  prompt: string | null;
-  model: string | null;
-  tags: string[] | null;
-};
+import { PromptRow } from '@/lib/supabase/client';
 
 type AdminTableProps = {
-  prompts: Prompt[];
+  prompts: PromptRow[];
 };
 
 export default function AdminTable({ prompts: initialPrompts }: AdminTableProps) {
   const [prompts, setPrompts] = useState(initialPrompts);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingFields, setEditingFields] = useState<Partial<Prompt>>({});
+  const [editingFields, setEditingFields] = useState<Partial<PromptRow>>({});
   const [isSaving, setIsSaving] = useState(false);
   const { showToast } = useToast();
 
-  const startEdit = (prompt: Prompt) => {
+  const startEdit = (prompt: PromptRow) => {
     setEditingId(prompt.id);
     setEditingFields({
       title: prompt.title,
