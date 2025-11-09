@@ -1,6 +1,22 @@
+export const viewport = { themeColor: '#000000' };
+
+'use client';
+
 import Link from 'next/link';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function NotFound() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-16 text-center text-white">Loading…</div>}>
+      <NotFoundInner />
+    </Suspense>
+  );
+}
+
+function NotFoundInner() {
+  const searchParams = useSearchParams();
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-2xl mx-auto text-center">
@@ -10,7 +26,7 @@ export default function NotFound() {
           </h1>
           <p className="text-2xl font-semibold mb-2">Page Not Found</p>
           <p className="text-gray-600 dark:text-gray-400 mb-8">
-            The page you're looking for doesn't exist.
+            {searchParams.get('message') || "The page you're looking for doesn't exist."}
           </p>
         </div>
 
