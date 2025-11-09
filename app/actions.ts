@@ -99,17 +99,17 @@ export async function createPrompt(data: {
     slug,
   };
 
-  const { data, error } = await supabase
+  const { data: inserted, error: insertError } = await supabase
     .from('prompts')
     .insert([insertData] as any)
     .select()
     .single<PromptRecord>();
 
-  const prompt = data as PromptRecord;
-
-  if (error) {
-    throw new Error(`Failed to create prompt: ${error.message}`);
+  if (insertError || !inserted) {
+    throw new Error(`Failed to create prompt: ${insertError?.message || 'Unknown error'}`);
   }
+
+  const prompt = inserted as PromptRecord;
 
   revalidatePath('/browse');
   revalidatePath('/');
@@ -214,17 +214,17 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
     };
   }
 
-  const { data, error } = await (supabase.from('prompts') as any)
+  const { data: updated, error: updateError } = await (supabase.from('prompts') as any)
     .update(updatePayload as PromptUpdate)
     .eq('id', id)
     .select()
     .single<PromptRecord>();
 
-  const prompt = data as PromptRecord;
-
-  if (error) {
-    throw new Error(`Failed to update prompt: ${error.message}`);
+  if (updateError || !updated) {
+    throw new Error(`Failed to update prompt: ${updateError?.message || 'Unknown error'}`);
   }
+
+  const prompt = updated as PromptRecord;
 
   revalidatePath('/admin');
   revalidatePath('/browse');
