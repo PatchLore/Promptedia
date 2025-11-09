@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -25,8 +25,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = await createClient();
-
     // attempt up to 3 pages to find a unique image
     const perPage = 30;
     const maxTries = 3;

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import AdminTable from '@/components/AdminTable';
 import Link from 'next/link';
 import AdminAuthCheck from '@/components/AdminAuthCheck';
@@ -12,8 +12,6 @@ export const metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
-  const supabase = await createClient();
-
   // Fetch all prompts
   const { data: prompts, error } = await supabase
     .from('prompts')

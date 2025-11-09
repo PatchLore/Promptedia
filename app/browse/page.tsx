@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import BrowseClient from '@/components/BrowseClient';
 import PromptCardSkeleton from '@/components/PromptCardSkeleton';
 import { Suspense } from 'react';
@@ -27,10 +27,7 @@ export default async function BrowsePage({
 }: {
   searchParams: Promise<{ search?: string; category?: string }>;
 }) {
-  const [supabase, params] = await Promise.all([
-    createClient(),
-    searchParams,
-  ]);
+  const params = await searchParams;
   const search = params.search || '';
   const category = params.category || 'all';
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';

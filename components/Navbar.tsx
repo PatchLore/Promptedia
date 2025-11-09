@@ -1,10 +1,9 @@
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import AuthButton from './AuthButton';
 import SearchBar from './SearchBar';
 
 export default async function Navbar() {
-  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

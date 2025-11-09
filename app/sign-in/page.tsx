@@ -1,6 +1,6 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,6 @@ import Link from 'next/link';
 
 export default function SignInPage() {
   const router = useRouter();
-  const supabase = createClient();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://www.onpointprompt.com');
 
   useEffect(() => {

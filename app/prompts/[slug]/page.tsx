@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase, PromptRow } from '@/lib/supabase/client';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
@@ -9,18 +9,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function PromptSlugPage({ params }: { params: { slug: string } }) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
   const { data: prompt, error } = await supabase
     .from('prompts')
     .select('*')
     .eq('slug', params.slug)
-    .single();
+    .single<PromptRow>();
 
-  if (error || !prompt) {
+  if (error || !prompt || !prompt.slug) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Prompt fetch error:', error);
     }
@@ -35,14 +30,14 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
         <p className="text-gray-300 text-lg mb-8">{prompt.description}</p>
       )}
 
-      {prompt.example_prompt && (
+      {prompt.prompt && (
         <div className="bg-gray-900/60 border border-gray-700 rounded-lg p-6 mb-10">
           <h2 className="text-xl font-semibold mb-3 text-white">Prompt</h2>
           <pre className="text-gray-200 whitespace-pre-wrap leading-relaxed mb-4">
-            {prompt.example_prompt}
+            {prompt.prompt}
           </pre>
           <button
-            onClick={() => navigator.clipboard.writeText(prompt.example_prompt)}
+            onClick={() => navigator.clipboard.writeText(prompt.prompt ?? '')}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition-colors text-white rounded-md"
           >
             Copy Prompt

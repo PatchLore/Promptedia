@@ -1,29 +1,11 @@
 'use server';
 
 import { randomUUID } from 'crypto';
-import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { Database } from '@/lib/supabase/types';
+import { supabase, PromptRow, PromptInsert, PromptUpdate } from '@/lib/supabase/client';
 import { buildPromptPath, isValidSlug, slugifyTitle } from '@/lib/slug';
 
-type PromptInsert = Database['public']['Tables']['prompts']['Insert'];
-type PromptRecord = {
-  id: string;
-  slug: string | null;
-  title: string | null;
-  prompt: string | null;
-  category: string | null;
-  type: string | null;
-  audio_preview_url: string | null;
-  thumbnail_url: string | null;
-  description: string | null;
-  created_at?: string;
-  [key: string]: any;
-};
-type PromptUpdate = Partial<PromptRecord>;
-
 async function generateUniqueSlug(
-  supabase: Awaited<ReturnType<typeof createClient>>,
   title: string,
   options: { excludeId?: string } = {}
 ): Promise<string> {
@@ -36,11 +18,11 @@ async function generateUniqueSlug(
   while (attempt < 5) {
     const result = await supabase
       .from('prompts')
-      .select('id, slug')
+      .select('*')
       .eq('slug', candidate)
-      .maybeSingle<PromptRecord>();
+      .maybeSingle<PromptRow>();
 
-    const existing: PromptRecord | null = result?.data ?? null;
+    const existing: PromptRow | null = result?.data ?? null;
     const error = result?.error;
 
     if (error) {
@@ -77,40 +59,52 @@ async function revalidatePromptPaths(
 }
 
 export async function createPrompt(data: {
+  id?: string;
   title: string;
-  prompt: string;
+  slug?: string | null;
+  prompt?: string | null;
   category?: string | null;
   type?: string | null;
   audio_preview_url?: string | null;
   thumbnail_url?: string | null;
   description?: string | null;
-}): Promise<PromptRecord> {
-  const supabase = await createClient();
+  model?: string | null;
+  tags?: string[] | null;
+  is_public?: boolean | null;
+}): Promise<PromptRow> {
+  const baseSlug = data.slug ?? data.title;
+  const safeSlug = await generateUniqueSlug(baseSlug);
 
-  const slug = await generateUniqueSlug(supabase, data.title);
+  const nowIso = new Date().toISOString();
 
   const insertData: PromptInsert = {
-    title: data.title,
-    prompt: data.prompt,
+    id: data.id ?? randomUUID(),
+    title: data.title ?? null,
+    slug: safeSlug,
+    prompt: data.prompt ?? null,
     category: data.category ?? null,
     type: data.type ?? null,
     audio_preview_url: data.audio_preview_url ?? null,
     thumbnail_url: data.thumbnail_url ?? null,
     description: data.description ?? null,
-    slug,
+    model: data.model ?? null,
+    tags: data.tags ?? null,
+    is_public: data.is_public ?? true,
+    created_at: nowIso,
+    updated_at: nowIso,
   };
 
   const { data: inserted, error: insertError } = await supabase
     .from('prompts')
-    .insert([insertData] as any)
+    .insert(insertData)
     .select()
-    .single<PromptRecord>();
+    .single<PromptRow>();
 
   if (insertError || !inserted) {
     throw new Error(`Failed to create prompt: ${insertError?.message || 'Unknown error'}`);
   }
 
-  const prompt = inserted as PromptRecord;
+  const prompt = inserted;
 
   revalidatePath('/browse');
   revalidatePath('/');
@@ -119,8 +113,6 @@ export async function createPrompt(data: {
 }
 
 export async function toggleFavorite(promptId: string) {
-  const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -135,14 +127,14 @@ export async function toggleFavorite(promptId: string) {
     .select('id')
     .eq('user_id', user.id)
     .eq('prompt_id', promptId)
-    .maybeSingle();
+    .maybeSingle<{ id: string }>();
 
-  if (existingFavorite && (existingFavorite as any).id) {
+  if (existingFavorite?.id) {
     // Remove favorite
     const { error } = await supabase
       .from('favorites')
       .delete()
-      .eq('id', (existingFavorite as any).id);
+      .eq('id', existingFavorite.id);
 
     if (error) {
       throw new Error(`Failed to remove favorite: ${error.message}`);
@@ -150,16 +142,16 @@ export async function toggleFavorite(promptId: string) {
 
     const { data: promptMeta } = await supabase
       .from('prompts')
-      .select('id, slug')
+      .select('*')
       .eq('id', promptId)
-      .maybeSingle<PromptRecord>();
+      .maybeSingle<PromptRow>();
 
     revalidatePath('/profile');
     revalidatePromptPaths(promptMeta?.slug, promptId);
     return false;
   } else {
     // Add favorite
-    const { error } = await (supabase.from('favorites') as any).insert([
+    const { error } = await supabase.from('favorites').insert([
       {
         user_id: user.id,
         prompt_id: promptId,
@@ -172,9 +164,9 @@ export async function toggleFavorite(promptId: string) {
 
     const { data: promptMeta } = await supabase
       .from('prompts')
-      .select('id, slug')
+      .select('*')
       .eq('id', promptId)
-      .maybeSingle<PromptRecord>();
+      .maybeSingle<PromptRow>();
 
     revalidatePath('/profile');
     revalidatePromptPaths(promptMeta?.slug, promptId);
@@ -182,14 +174,12 @@ export async function toggleFavorite(promptId: string) {
   }
 }
 
-export async function updatePrompt(id: string, fields: PromptUpdate): Promise<PromptRecord> {
-  const supabase = await createClient();
-
+export async function updatePrompt(id: string, fields: PromptUpdate): Promise<PromptRow> {
   const { data: existingPrompt } = await supabase
     .from('prompts')
-    .select('id, slug')
+    .select('*')
     .eq('id', id)
-    .maybeSingle<PromptRecord>();
+    .maybeSingle<PromptRow>();
 
   const previousSlug = existingPrompt?.slug ?? null;
 
@@ -200,31 +190,27 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
     typeof fields.title === 'string' &&
     fields.title.trim().length > 0
   ) {
-    const newSlug = await generateUniqueSlug(supabase, fields.title, { excludeId: id });
-    updatePayload = {
-      ...updatePayload,
-      slug: newSlug,
-    };
+    const newSlug = await generateUniqueSlug(fields.title, { excludeId: id });
+    updatePayload.slug = newSlug;
   } else if (fields.slug && !isValidSlug(fields.slug)) {
-    const safeSlug = await generateUniqueSlug(supabase, fields.slug, { excludeId: id });
-    updatePayload = {
-      ...updatePayload,
-      slug: safeSlug,
-    };
+    const safeSlug = await generateUniqueSlug(fields.slug, { excludeId: id });
+    updatePayload.slug = safeSlug;
   }
+
+  updatePayload.updated_at = new Date().toISOString();
 
   const { data: updated, error: updateError } = await supabase
     .from('prompts')
     .update(updatePayload)
     .eq('id', id)
     .select()
-    .single<PromptRecord>();
+    .single<PromptRow>();
 
   if (updateError || !updated) {
     throw new Error(`Failed to update prompt: ${updateError?.message || 'Unknown error'}`);
   }
 
-  const prompt = updated as PromptRecord;
+  const prompt = updated;
 
   revalidatePath('/admin');
   revalidatePath('/browse');
@@ -238,8 +224,6 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
 }
 
 export async function deletePrompt(id: string) {
-  const supabase = await createClient();
-
   const { error } = await supabase
     .from('prompts')
     .delete()

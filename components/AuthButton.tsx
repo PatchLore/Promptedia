@@ -1,6 +1,6 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -11,7 +11,6 @@ type AuthButtonProps = {
 export default function AuthButton({ user }: AuthButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClient();
 
   const handleSignOut = async () => {
     setIsLoading(true);
@@ -31,6 +30,3 @@ export default function AuthButton({ user }: AuthButtonProps) {
     </button>
   );
 }
-
-
-

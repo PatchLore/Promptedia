@@ -20,7 +20,11 @@ export interface Database {
           audio_preview_url: string | null;
           thumbnail_url: string | null;
           description: string | null;
+          model: string | null;
+          tags: string[] | null;
+          is_public: boolean | null;
           created_at: string;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
@@ -32,9 +36,28 @@ export interface Database {
           audio_preview_url?: string | null;
           thumbnail_url?: string | null;
           description?: string | null;
+          model?: string | null;
+          tags?: string[] | null;
+          is_public?: boolean | null;
           created_at?: string;
+          updated_at?: string | null;
         };
-        Update: Partial<Database['public']['Tables']['prompts']['Insert']>;
+        Update: {
+          id?: string;
+          title?: string | null;
+          slug?: string | null;
+          prompt?: string | null;
+          category?: string | null;
+          type?: string | null;
+          audio_preview_url?: string | null;
+          thumbnail_url?: string | null;
+          description?: string | null;
+          model?: string | null;
+          tags?: string[] | null;
+          is_public?: boolean | null;
+          created_at?: string;
+          updated_at?: string | null;
+        };
       };
       favorites: {
         Row: {

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import { Affiliate, getDefaultAffiliate } from './affiliate';
 
 /**
@@ -12,8 +12,6 @@ export async function pickAffiliateForCategoryServer(
   }
 
   try {
-    const supabase = await createClient();
-
     // Normalize category to lowercase for matching
     const categoryLower = category.toLowerCase();
 

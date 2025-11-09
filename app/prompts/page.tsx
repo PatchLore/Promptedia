@@ -1,15 +1,14 @@
-import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase/client';
 
-export default async function PromptsPage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string }> }) {
+export default async function PromptsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; category?: string }>;
+}) {
   const params = await searchParams;
   const category = params?.category || '';
   const search = params?.q || '';
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
 
   let query = supabase
     .from('prompts')

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import PromptGrid from '@/components/PromptGrid';
 import Link from 'next/link';
 
@@ -11,8 +11,6 @@ const categories = [
 ];
 
 export default async function HomePage() {
-  const supabase = await createClient();
-  
   // Fetch featured prompts (public, non-pro)
   const { data: featuredPrompts } = await supabase
     .from('prompts')

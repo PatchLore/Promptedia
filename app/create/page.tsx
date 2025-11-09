@@ -1,5 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { supabase } from '@/lib/supabase/client';
 import CreatePromptForm from '@/components/CreatePromptForm';
 
 export const metadata = {
@@ -8,15 +7,9 @@ export const metadata = {
 };
 
 export default async function CreatePage() {
-  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  // For MVP, allow anyone to create (you can add admin check later)
-  // if (!user) {
-  //   redirect('/');
-  // }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">

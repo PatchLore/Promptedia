@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import { redirect } from 'next/navigation';
 import PromptGrid from '@/components/PromptGrid';
 
@@ -8,7 +8,6 @@ export const metadata = {
 };
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

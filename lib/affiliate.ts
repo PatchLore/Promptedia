@@ -1,4 +1,4 @@
-import { createClient as createBrowserClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 
 export type Affiliate = {
   id: string;
@@ -24,8 +24,6 @@ export async function pickAffiliateForCategory(
   }
 
   try {
-    const supabase = createBrowserClient();
-
     // Normalize category to lowercase for matching
     const categoryLower = category.toLowerCase();
 
