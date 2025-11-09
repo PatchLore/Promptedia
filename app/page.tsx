@@ -1,6 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import { supabase } from '@/lib/supabase/client';
 import PromptGrid from '@/components/PromptGrid';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { ToastProvider } from '@/components/ToastProvider';
+import PostHogProvider from '@/providers/PostHogProvider';
 
 const categories = [
   { name: 'Art', slug: 'art', icon: '🎨' },
@@ -11,7 +17,6 @@ const categories = [
 ];
 
 export default async function HomePage() {
-  // Fetch featured prompts (public, non-pro)
   const { data: featuredPrompts } = await supabase
     .from('prompts')
     .select('*')
@@ -20,9 +25,8 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(12);
 
-  return (
+  const content = (
     <div className="container mx-auto px-4 py-12">
-      {/* Hero Section */}
       <section className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           On Point Prompt
@@ -46,7 +50,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Categories Grid */}
       <section className="mb-16">
         <h2 className="text-3xl font-bold mb-6 text-center">Browse by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -63,7 +66,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Prompts */}
       <section>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold">Featured Prompts</h2>
@@ -77,6 +79,18 @@ export default async function HomePage() {
         <PromptGrid prompts={featuredPrompts || []} />
       </section>
     </div>
+  );
+
+  return (
+    <PostHogProvider>
+      <ToastProvider>
+        <div className="flex min-h-screen flex-col">
+          <Navbar />
+          <main className="flex-1">{content}</main>
+          <Footer />
+        </div>
+      </ToastProvider>
+    </PostHogProvider>
   );
 }
 

@@ -1,12 +1,36 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import AuthButton from './AuthButton';
 import SearchBar from './SearchBar';
 
-export default async function Navbar() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+type User = NonNullable<Awaited<ReturnType<typeof supabase.auth.getUser>>['data']['user']>;
+
+export default function Navbar() {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    // Initial fetch
+    supabase.auth.getUser().then(({ data }) => {
+      if (!mounted) return;
+      setUser(data.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
@@ -15,7 +39,7 @@ export default async function Navbar() {
           <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             On Point Prompt
           </Link>
-          
+
           <div className="flex-1 max-w-md mx-8">
             <SearchBar />
           </div>

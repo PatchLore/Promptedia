@@ -4,13 +4,16 @@ import PromptCardSkeleton from '@/components/PromptCardSkeleton';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { buildPromptUrl } from '@/lib/slug';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { ToastProvider } from '@/components/ToastProvider';
+import PostHogProvider from '@/providers/PostHogProvider';
 
 export const metadata: Metadata = {
   title: 'Browse Prompts - On Point Prompt',
   description: 'Search and filter AI prompts by category, type, and keywords',
 };
 
-// Force dynamic rendering to ensure searchParams are fresh
 export const dynamic = 'force-dynamic';
 
 const categories = [
@@ -25,39 +28,33 @@ const categories = [
 export default async function BrowsePage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; category?: string }>;
+  searchParams?: { search?: string; category?: string };
 }) {
-  const params = await searchParams;
-  const search = params.search || '';
-  const category = params.category || 'all';
+  const search = searchParams?.search ?? '';
+  const category = searchParams?.category ?? 'all';
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
 
-  // Build the base query
   let query = supabase
     .from('prompts')
     .select('*')
     .eq('is_public', true)
     .eq('is_pro', false);
 
-  // Apply category filter (case-insensitive)
   if (category !== 'all') {
-    // Capitalize first letter to match database format
     const categoryFilter = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
     query = query.eq('category', categoryFilter);
   }
 
-  // Client-side fuzzy search will handle `search`, but we can leave server unfiltered to allow fuzzy
   const { data: prompts, error } = await query.order('created_at', { ascending: false });
 
-  // Log for debugging (remove in production)
   if (error) {
     console.error('Supabase query error:', error);
   }
 
-  return (
+  const content = (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold mb-8">Browse Prompts</h1>
-      {/* Upsell banner */}
+
       <div className="mb-6">
         <a
           href="/packs"
@@ -66,7 +63,7 @@ export default async function BrowsePage({
           💡 Want all 100+ prompts in one pack? → Get the Creator Bundle
         </a>
       </div>
-      {/* ItemList JSON-LD for list/categorized pages */}
+
       <script
         type="application/ld+json"
         suppressHydrationWarning
@@ -87,19 +84,34 @@ export default async function BrowsePage({
           }),
         }}
       />
-      <Suspense fallback={
-        <div className="space-y-6">
-          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
-          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <PromptCardSkeleton key={i} />
-            ))}
+
+      <Suspense
+        fallback={
+          <div className="space-y-6">
+            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <PromptCardSkeleton key={i} />
+              ))}
+            </div>
           </div>
-        </div>
-      }>
+        }
+      >
         <BrowseClient categories={categories} prompts={prompts || []} />
       </Suspense>
     </div>
+  );
+
+  return (
+    <PostHogProvider>
+      <ToastProvider>
+        <div className="flex min-h-screen flex-col">
+          <Navbar />
+          <main className="flex-1">{content}</main>
+          <Footer />
+        </div>
+      </ToastProvider>
+    </PostHogProvider>
   );
 }

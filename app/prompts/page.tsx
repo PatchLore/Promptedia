@@ -1,14 +1,19 @@
+export const dynamic = "force-dynamic";
+
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { ToastProvider } from '@/components/ToastProvider';
+import PostHogProvider from '@/providers/PostHogProvider';
 
 export default async function PromptsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams?: { q?: string; category?: string };
 }) {
-  const params = await searchParams;
-  const category = params?.category || '';
-  const search = params?.q || '';
+  const category = searchParams?.category || '';
+  const search = searchParams?.q || '';
 
   let query = supabase
     .from('prompts')
@@ -27,18 +32,31 @@ export default async function PromptsPage({
 
   const { data: prompts, error } = await query;
 
+  const wrapContent = (content: any) => (
+    <PostHogProvider>
+      <ToastProvider>
+        <div className="flex min-h-screen flex-col">
+          <Navbar />
+          <main className="flex-1">{content}</main>
+          <Footer />
+        </div>
+      </ToastProvider>
+    </PostHogProvider>
+  );
+
   if (error) {
     console.error('Error fetching prompts:', error);
-    return <div>Error loading prompts.</div>;
+    return wrapContent(<div className="container mx-auto px-4 py-10">Error loading prompts.</div>);
   }
 
   if (!prompts?.length) {
-    return <div>No prompts found.</div>;
+    return wrapContent(<div className="container mx-auto px-4 py-10">No prompts found.</div>);
   }
 
-  return (
+  const content = (
     <div className="max-w-5xl mx-auto py-10 px-4">
       <h1 className="text-4xl font-bold mb-8">All Prompts</h1>
+
       <div className="flex flex-wrap gap-3 mb-8">
         {['Writing', 'Art', 'Coding', 'Business', 'Music'].map((cat) => (
           <Link
@@ -53,6 +71,7 @@ export default async function PromptsPage({
             {cat}
           </Link>
         ))}
+
         {category && (
           <Link
             href="/prompts"
@@ -62,10 +81,9 @@ export default async function PromptsPage({
           </Link>
         )}
       </div>
+
       <form method="get" className="mb-8">
-        {category && (
-          <input type="hidden" name="category" value={category} />
-        )}
+        {category && <input type="hidden" name="category" value={category} />}
         <input
           type="text"
           name="q"
@@ -82,7 +100,9 @@ export default async function PromptsPage({
             href={`/prompts/${prompt.slug}`}
             className="block bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:bg-gray-900 transition shadow hover:shadow-lg"
           >
-            <h2 className="text-xl font-semibold text-white line-clamp-2">{prompt.title}</h2>
+            <h2 className="text-xl font-semibold text-white line-clamp-2">
+              {prompt.title}
+            </h2>
 
             {prompt.description && (
               <p className="text-gray-400 text-sm mt-3 line-clamp-3">
@@ -100,5 +120,7 @@ export default async function PromptsPage({
       </div>
     </div>
   );
+
+  return wrapContent(content);
 }
 

@@ -14,12 +14,14 @@ export default function ProfileClient({ promptIds }: ProfileClientProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
+    let active = true;
 
     async function loadPrompts() {
       if (promptIds.length === 0) {
-        setPrompts([]);
-        setIsLoading(false);
+        if (active) {
+          setPrompts([]);
+          setIsLoading(false);
+        }
         return;
       }
 
@@ -27,15 +29,15 @@ export default function ProfileClient({ promptIds }: ProfileClientProps) {
         .from('prompts')
         .select('*')
         .in('id', promptIds)
-        .order('created_at', { ascending: false } as any);
+        .order('created_at', { ascending: false });
 
-      if (!isMounted) return;
+      if (!active) return;
 
       if (error) {
         console.error('Error loading prompts:', error);
         setPrompts([]);
       } else {
-        setPrompts((data as PromptRow[]) || []);
+        setPrompts(data || []);
       }
 
       setIsLoading(false);
@@ -44,7 +46,7 @@ export default function ProfileClient({ promptIds }: ProfileClientProps) {
     loadPrompts();
 
     return () => {
-      isMounted = false;
+      active = false;
     };
   }, [promptIds]);
 

@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { PromptPack } from '@/lib/monetization';
 import posthog from 'posthog-js';
