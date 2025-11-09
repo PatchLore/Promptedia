@@ -215,7 +215,7 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
 
   const { data: updated, error: updateError } = await supabase
     .from('prompts')
-    .update(updatePayload as any)
+    .update(updatePayload)
     .eq('id', id)
     .select()
     .single<PromptRecord>();
