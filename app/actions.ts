@@ -9,9 +9,15 @@ import { buildPromptPath, isValidSlug, slugifyTitle } from '@/lib/slug';
 type PromptInsert = Database['public']['Tables']['prompts']['Insert'];
 type PromptRecord = {
   id: string;
-  slug: string;
-  title?: string;
-  category?: string;
+  slug: string | null;
+  title: string | null;
+  prompt: string | null;
+  category: string | null;
+  type: string | null;
+  audio_preview_url: string | null;
+  thumbnail_url: string | null;
+  description: string | null;
+  created_at?: string;
   [key: string]: any;
 };
 type PromptUpdate = Partial<PromptRecord>;
@@ -73,14 +79,11 @@ async function revalidatePromptPaths(
 export async function createPrompt(data: {
   title: string;
   prompt: string;
-  category: string;
-  type: string;
-  example_url?: string;
-  model?: string;
-  tags?: string[];
-  is_public: boolean;
-  is_pro: boolean;
-  user_id: string | null;
+  category?: string | null;
+  type?: string | null;
+  audio_preview_url?: string | null;
+  thumbnail_url?: string | null;
+  description?: string | null;
 }): Promise<PromptRecord> {
   const supabase = await createClient();
 
@@ -89,14 +92,11 @@ export async function createPrompt(data: {
   const insertData: PromptInsert = {
     title: data.title,
     prompt: data.prompt,
-    category: data.category,
-    type: data.type,
-    example_url: data.example_url || null,
-    model: data.model || null,
-    tags: data.tags || null,
-    is_public: data.is_public,
-    is_pro: data.is_pro,
-    user_id: data.user_id,
+    category: data.category ?? null,
+    type: data.type ?? null,
+    audio_preview_url: data.audio_preview_url ?? null,
+    thumbnail_url: data.thumbnail_url ?? null,
+    description: data.description ?? null,
     slug,
   };
 
