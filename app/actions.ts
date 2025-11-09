@@ -7,7 +7,13 @@ import { Database } from '@/lib/supabase/types';
 import { buildPromptPath, isValidSlug, slugifyTitle } from '@/lib/slug';
 
 type PromptInsert = Database['public']['Tables']['prompts']['Insert'];
-type PromptRecord = { id?: string; slug?: string | null; [key: string]: any };
+type PromptRecord = {
+  id: string;
+  slug: string;
+  title?: string;
+  category?: string;
+  [key: string]: any;
+};
 
 async function generateUniqueSlug(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -23,7 +29,7 @@ async function generateUniqueSlug(
   while (attempt < 5) {
     const result = await supabase
       .from('prompts')
-      .select('id')
+      .select('id, slug')
       .eq('slug', candidate)
       .maybeSingle<PromptRecord>();
 
@@ -74,7 +80,7 @@ export async function createPrompt(data: {
   is_public: boolean;
   is_pro: boolean;
   user_id: string | null;
-}) {
+}): Promise<PromptRecord> {
   const supabase = await createClient();
 
   const slug = await generateUniqueSlug(supabase, data.title);
@@ -93,11 +99,13 @@ export async function createPrompt(data: {
     slug,
   };
 
-  const { data: prompt, error } = await supabase
+  const { data, error } = await supabase
     .from('prompts')
     .insert([insertData] as any)
     .select()
-    .single();
+    .single<PromptRecord>();
+
+  const prompt = data as PromptRecord;
 
   if (error) {
     throw new Error(`Failed to create prompt: ${error.message}`);
@@ -141,7 +149,7 @@ export async function toggleFavorite(promptId: string) {
 
     const { data: promptMeta } = await supabase
       .from('prompts')
-      .select('slug')
+      .select('id, slug')
       .eq('id', promptId)
       .maybeSingle<PromptRecord>();
 
@@ -163,7 +171,7 @@ export async function toggleFavorite(promptId: string) {
 
     const { data: promptMeta } = await supabase
       .from('prompts')
-      .select('slug')
+      .select('id, slug')
       .eq('id', promptId)
       .maybeSingle<PromptRecord>();
 
@@ -175,12 +183,12 @@ export async function toggleFavorite(promptId: string) {
 
 type PromptUpdate = Database['public']['Tables']['prompts']['Update'];
 
-export async function updatePrompt(id: string, fields: PromptUpdate) {
+export async function updatePrompt(id: string, fields: PromptUpdate): Promise<PromptRecord> {
   const supabase = await createClient();
 
   const { data: existingPrompt } = await supabase
     .from('prompts')
-    .select('slug')
+    .select('id, slug')
     .eq('id', id)
     .maybeSingle<PromptRecord>();
 
@@ -210,7 +218,9 @@ export async function updatePrompt(id: string, fields: PromptUpdate) {
     .update(updatePayload as PromptUpdate)
     .eq('id', id)
     .select()
-    .single();
+    .single<PromptRecord>();
+
+  const prompt = data as PromptRecord;
 
   if (error) {
     throw new Error(`Failed to update prompt: ${error.message}`);
@@ -219,12 +229,12 @@ export async function updatePrompt(id: string, fields: PromptUpdate) {
   revalidatePath('/admin');
   revalidatePath('/browse');
   revalidatePath('/');
-  if (previousSlug && previousSlug !== data?.slug) {
+  if (previousSlug && previousSlug !== prompt.slug) {
     revalidatePath(buildPromptPath({ id, slug: previousSlug }));
   }
-  revalidatePromptPaths(data?.slug, id);
+  revalidatePromptPaths(prompt.slug, id);
   
-  return data;
+  return prompt;
 }
 
 export async function deletePrompt(id: string) {
