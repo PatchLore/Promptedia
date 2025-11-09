@@ -14,6 +14,7 @@ type PromptRecord = {
   category?: string;
   [key: string]: any;
 };
+type PromptUpdate = Partial<PromptRecord>;
 
 async function generateUniqueSlug(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -181,8 +182,6 @@ export async function toggleFavorite(promptId: string) {
   }
 }
 
-type PromptUpdate = Database['public']['Tables']['prompts']['Update'];
-
 export async function updatePrompt(id: string, fields: PromptUpdate): Promise<PromptRecord> {
   const supabase = await createClient();
 
@@ -194,7 +193,7 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
 
   const previousSlug = existingPrompt?.slug ?? null;
 
-  let updatePayload = { ...fields };
+  let updatePayload: PromptUpdate = { ...fields };
 
   if (
     fields.slug === undefined &&
@@ -216,7 +215,7 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
 
   const { data: updated, error: updateError } = await supabase
     .from('prompts')
-    .update(updatePayload as PromptUpdate)
+    .update(updatePayload)
     .eq('id', id)
     .select()
     .single<PromptRecord>();
