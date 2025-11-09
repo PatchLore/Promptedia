@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { buildPromptPath } from '@/lib/slug';
 import AffiliateCTA from './AffiliateCTA';
 
 type PromptCardProps = {
@@ -8,7 +9,7 @@ type PromptCardProps = {
 
 export default function PromptCard({ prompt }: PromptCardProps) {
   return (
-    <Link href={`/prompt/${prompt.id}`}>
+    <Link href={buildPromptPath(prompt)}>
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 ease-out hover:scale-105 overflow-hidden h-full flex flex-col">
         {prompt.example_url && prompt.type !== 'audio' && /^https?:/i.test(prompt.example_url) ? (
           <div className="relative w-full aspect-video">

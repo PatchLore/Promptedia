@@ -7,63 +7,107 @@ import { pickAffiliateForCategoryServer } from '@/lib/affiliate-server';
 import { CopyButton, FavoriteButton } from '@/components/PromptActions';
 import MusicPreviewSection from '@/components/MusicPreviewSection';
 import { Metadata } from 'next';
+import { buildPromptPath, buildPromptUrl, isUuid } from '@/lib/slug';
 
-type Props = {
-  params: Promise<{ id: string }>;
-};
+type RouteParams = Record<string, string>;
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const supabase = await createClient();
-  const { data: prompt } = await supabase
+async function fetchPromptByIdentifier(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  identifier: string
+) {
+  const normalized = identifier.toLowerCase();
+
+  const { data: bySlug, error: slugError } = await supabase
     .from('prompts')
     .select('*')
-    .eq('id', id)
-    .single();
+    .eq('slug', normalized)
+    .maybeSingle();
 
-  if (!prompt) {
-    return {
-      title: 'Prompt Not Found',
-    };
+  if (bySlug) {
+    return bySlug as any;
   }
 
-  const promptData = prompt as any;
+  if (slugError && process.env.NODE_ENV === 'development') {
+    console.error('Error fetching prompt by slug:', slugError);
+  }
+
+  if (isUuid(identifier)) {
+    const { data: byId, error: idError } = await supabase
+      .from('prompts')
+      .select('*')
+      .eq('id', identifier)
+      .maybeSingle();
+
+    if (byId) {
+      return byId as any;
+    }
+
+    if (idError && process.env.NODE_ENV === 'development') {
+      console.error('Error fetching prompt by id:', idError);
+    }
+  }
+
+  return null;
+}
+
+function extractIdentifier(params: RouteParams): string | null {
+  return params.id || params.slug || params.promptId || null;
+}
+
+export async function generateMetadata({ params }: { params: Promise<RouteParams> }): Promise<Metadata> {
+  const routeParams = await params;
+  const identifier = extractIdentifier(routeParams);
+
+  if (!identifier) {
+    return { title: 'Prompt Not Found' };
+  }
+
+  const supabase = await createClient();
+  const promptData = await fetchPromptByIdentifier(supabase, identifier);
+
+  if (!promptData) {
+    return { title: 'Prompt Not Found' };
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+  const canonicalUrl = buildPromptUrl(baseUrl, promptData);
 
   return {
     title: `${promptData.title || 'Prompt'} - On Point Prompt`,
     description: promptData.prompt?.substring(0, 160) || 'AI prompt from On Point Prompt',
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: promptData.title || 'Prompt',
       description: promptData.prompt?.substring(0, 160) || '',
+      url: canonicalUrl,
       images: promptData.example_url ? [promptData.example_url] : [],
     },
   };
 }
 
-export default async function PromptPage({ params }: Props) {
-  const { id } = await params;
-  const supabase = await createClient();
-  
-  const { data: prompt } = await supabase
-    .from('prompts')
-    .select('*')
-    .eq('id', id)
-    .single();
+export default async function PromptPage({ params }: { params: Promise<RouteParams> }) {
+  const routeParams = await params;
+  const identifier = extractIdentifier(routeParams);
 
-  if (!prompt || !(prompt as any).is_public) {
+  if (!identifier) {
     notFound();
   }
 
-  const promptData = prompt as any;
+  const supabase = await createClient();
+  const promptData = await fetchPromptByIdentifier(supabase, identifier);
 
-  // Detect if this is an audio/music prompt
-  const isAudioPrompt = 
-    promptData.type === 'audio' || 
-    promptData.type === 'music' || 
+  if (!promptData || !promptData.is_public) {
+    notFound();
+  }
+
+  const isAudioPrompt =
+    promptData.type === 'audio' ||
+    promptData.type === 'music' ||
     promptData.category === 'Music' ||
     promptData.category === 'music';
 
-  // Fetch affiliate for this category
   const affiliate = await pickAffiliateForCategoryServer(promptData.category);
 
   const {
@@ -75,13 +119,13 @@ export default async function PromptPage({ params }: Props) {
         .from('favorites')
         .select('id')
         .eq('user_id', user.id)
-        .eq('prompt_id', id)
+        .eq('prompt_id', promptData.id)
         .single()
         .then(({ data }) => !!data)
     : false;
 
-  // Structured data for SEO
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+  const promptUrl = buildPromptUrl(baseUrl, promptData);
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -94,6 +138,7 @@ export default async function PromptPage({ params }: Props) {
     },
     dateCreated: promptData.created_at,
     keywords: promptData.tags?.join(', ') || promptData.category || '',
+    url: promptUrl,
     ...(promptData.example_url && {
       image: promptData.example_url,
     }),
@@ -121,7 +166,9 @@ export default async function PromptPage({ params }: Props) {
               '@type': 'ListItem',
               position: 3,
               name: promptData.category,
-              item: `${baseUrl}/browse?category=${encodeURIComponent((promptData.category || '').toLowerCase())}`,
+              item: `${baseUrl}/browse?category=${encodeURIComponent(
+                (promptData.category || '').toLowerCase()
+              )}`,
             },
           ]
         : []),
@@ -129,7 +176,7 @@ export default async function PromptPage({ params }: Props) {
         '@type': 'ListItem',
         position: promptData.category ? 4 : 3,
         name: promptData.title || 'Prompt',
-        item: `${baseUrl}/prompt/${id}`,
+        item: promptUrl,
       },
     ],
   };
@@ -146,27 +193,41 @@ export default async function PromptPage({ params }: Props) {
       />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-6">
-          {/* Visible breadcrumbs */}
           <nav aria-label="Breadcrumb" className="mb-3 text-sm text-gray-600 dark:text-gray-300">
             <ol className="flex flex-wrap items-center gap-1">
               <li>
-                <Link href="/" className="hover:underline">Home</Link>
+                <Link href="/" className="hover:underline">
+                  Home
+                </Link>
               </li>
-              <li aria-hidden className="opacity-60">›</li>
+              <li aria-hidden className="opacity-60">
+                ›
+              </li>
               <li>
-                <Link href="/browse" className="hover:underline">Browse</Link>
+                <Link href="/browse" className="hover:underline">
+                  Browse
+                </Link>
               </li>
               {promptData.category && (
                 <>
-                  <li aria-hidden className="opacity-60">›</li>
+                  <li aria-hidden className="opacity-60">
+                    ›
+                  </li>
                   <li>
-                    <Link href={`/browse?category=${encodeURIComponent((promptData.category || '').toLowerCase())}`} className="hover:underline">
+                    <Link
+                      href={`/browse?category=${encodeURIComponent(
+                        (promptData.category || '').toLowerCase()
+                      )}`}
+                      className="hover:underline"
+                    >
                       {promptData.category}
                     </Link>
                   </li>
                 </>
               )}
-              <li aria-hidden className="opacity-60">›</li>
+              <li aria-hidden className="opacity-60">
+                ›
+              </li>
               <li className="font-medium line-clamp-1 max-w-[60ch]" aria-current="page">
                 {promptData.title || 'Prompt'}
               </li>
@@ -192,19 +253,19 @@ export default async function PromptPage({ params }: Props) {
             <h2 className="text-xl font-semibold">Prompt</h2>
             <div className="flex gap-2">
               <CopyButton promptText={promptData.prompt || ''} />
-              {user && <FavoriteButton promptId={id} isFavorite={isFavorite} />}
+              {user && <FavoriteButton promptId={promptData.id} isFavorite={isFavorite} />}
             </div>
           </div>
-          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-            {promptData.prompt}
-          </p>
-          {/* Upsell banner below description */}
+          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{promptData.prompt}</p>
           <div className="mt-4">
-            <AffiliateCTA affiliate={affiliate} category={promptData.category} meta={{ prompt_id: id }} />
+            <AffiliateCTA
+              affiliate={affiliate}
+              category={promptData.category}
+              meta={{ prompt_id: promptData.id }}
+            />
           </div>
         </div>
 
-        {/* Audio Preview Section - only for audio/music prompts */}
         {isAudioPrompt && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
             <div className="mb-4">
@@ -216,14 +277,15 @@ export default async function PromptPage({ params }: Props) {
                 Generated via Soundswoop / Mubert AI
               </p>
             </div>
-            <MusicPreviewSection 
-              audioUrl={promptData.audio_preview_url || promptData.audio_url || promptData.example_url}
+            <MusicPreviewSection
+              audioUrl={
+                promptData.audio_preview_url || promptData.audio_url || promptData.example_url
+              }
               promptText={promptData.prompt || ''}
             />
           </div>
         )}
 
-        {/* Example Result Section - only for non-audio prompts */}
         {!isAudioPrompt && promptData.example_url && (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">Example Result</h2>
@@ -260,7 +322,6 @@ export default async function PromptPage({ params }: Props) {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Details</h2>
           <dl className="grid grid-cols-2 gap-4">
-            {/* Only show Model for non-audio prompts */}
             {!isAudioPrompt && promptData.model && (
               <>
                 <dt className="font-semibold">Model</dt>
@@ -273,10 +334,7 @@ export default async function PromptPage({ params }: Props) {
                 <dd>
                   <div className="flex flex-wrap gap-2">
                     {promptData.tags.map((tag: string) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm"
-                      >
+                      <span key={tag} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm">
                         {tag}
                       </span>
                     ))}

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { buildPromptUrl } from '@/lib/slug';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
@@ -36,14 +37,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const { data: prompts } = await supabase
     .from('prompts')
-    .select('id, created_at')
+        .select('id, slug, created_at')
     .eq('is_public', true)
     .eq('is_pro', false)
     .order('created_at', { ascending: false })
     .limit(5000);
 
-  const promptRoutes: MetadataRoute.Sitemap = (prompts || []).map((p: any) => ({
-    url: `${baseUrl}/prompt/${p.id}`,
+      const promptRoutes: MetadataRoute.Sitemap = (prompts || []).map((p: any) => ({
+        url: buildPromptUrl(baseUrl, p),
     changeFrequency: 'weekly',
     priority: 0.7,
     lastModified: new Date(p.updated_at || p.created_at || Date.now()),

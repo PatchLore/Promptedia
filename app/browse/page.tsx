@@ -3,6 +3,7 @@ import BrowseClient from '@/components/BrowseClient';
 import PromptCardSkeleton from '@/components/PromptCardSkeleton';
 import { Suspense } from 'react';
 import { Metadata } from 'next';
+import { buildPromptUrl } from '@/lib/slug';
 
 export const metadata: Metadata = {
   title: 'Browse Prompts - On Point Prompt',
@@ -82,7 +83,7 @@ export default async function BrowsePage({
             itemListElement: (prompts || []).map((p: any, idx: number) => ({
               '@type': 'ListItem',
               position: idx + 1,
-              url: `${baseUrl}/prompt/${p.id}`,
+              url: buildPromptUrl(baseUrl, p),
               name: p.title || 'Prompt',
               ...(p.example_url ? { image: p.example_url } : {}),
             })),

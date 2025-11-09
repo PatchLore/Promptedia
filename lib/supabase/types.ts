@@ -4,6 +4,7 @@ export type Database = {
       prompts: {
         Row: {
           id: string;
+          slug: string | null;
           title: string | null;
           prompt: string | null;
           category: string | null;
@@ -12,12 +13,14 @@ export type Database = {
           model: string | null;
           tags: string[] | null;
           user_id: string | null;
+          audio_preview_url: string | null;
           is_public: boolean;
           is_pro: boolean;
           created_at: string;
         };
         Insert: {
           id?: string;
+          slug?: string | null;
           title?: string | null;
           prompt?: string | null;
           category?: string | null;
@@ -26,12 +29,14 @@ export type Database = {
           model?: string | null;
           tags?: string[] | null;
           user_id?: string | null;
+          audio_preview_url?: string | null;
           is_public?: boolean;
           is_pro?: boolean;
           created_at?: string;
         };
         Update: {
           id?: string;
+          slug?: string | null;
           title?: string | null;
           prompt?: string | null;
           category?: string | null;
@@ -40,6 +45,7 @@ export type Database = {
           model?: string | null;
           tags?: string[] | null;
           user_id?: string | null;
+          audio_preview_url?: string | null;
           is_public?: boolean;
           is_pro?: boolean;
           created_at?: string;
