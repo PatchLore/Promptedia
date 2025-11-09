@@ -65,12 +65,15 @@ export async function createPrompt(data: {
   prompt?: string | null;
   category?: string | null;
   type?: string | null;
+  example_url?: string | null;
   audio_preview_url?: string | null;
   thumbnail_url?: string | null;
   description?: string | null;
   model?: string | null;
   tags?: string[] | null;
   is_public?: boolean | null;
+  is_pro?: boolean | null;
+  user_id?: string | null;
 }): Promise<PromptRow> {
   const baseSlug = data.slug ?? data.title;
   const safeSlug = await generateUniqueSlug(baseSlug);
@@ -84,12 +87,15 @@ export async function createPrompt(data: {
     prompt: data.prompt ?? null,
     category: data.category ?? null,
     type: data.type ?? null,
+    example_url: data.example_url ?? null,
     audio_preview_url: data.audio_preview_url ?? null,
     thumbnail_url: data.thumbnail_url ?? null,
     description: data.description ?? null,
     model: data.model ?? null,
     tags: data.tags ?? null,
     is_public: data.is_public ?? true,
+    is_pro: data.is_pro ?? false,
+    user_id: data.user_id ?? null,
     created_at: nowIso,
     updated_at: nowIso,
   };
