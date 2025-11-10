@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic';
 
-import PromptGrid from '@/components/PromptGrid';
 import Link from 'next/link';
 import WrapperClient from '@/app/WrapperClient';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import LazyPromptGrid from '@/components/LazyPromptGrid';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
 const canonicalUrl = `${siteUrl}/`;
@@ -158,7 +158,7 @@ export default async function HomePage() {
               View All Prompts
             </Link>
           </div>
-          <PromptGrid prompts={featuredPrompts || []} />
+          <LazyPromptGrid prompts={featuredPrompts || []} />
         </section>
       </div>
     </>

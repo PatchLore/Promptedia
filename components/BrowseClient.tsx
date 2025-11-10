@@ -1,18 +1,25 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useSearchParams, useRouter } from 'next/navigation';
-import PromptGrid from './PromptGrid';
 import SearchBar from './SearchBar';
 import TagFilter from './TagFilter';
 import SortDropdown from './SortDropdown';
 import TagChips from './TagChips';
+import { PromptGridSkeleton } from './LazyPromptGrid';
 
-type BrowseClientProps = {
+export type BrowseClientProps = {
   prompts: any[];
   categories: { name: string; slug: string }[];
   isInitialLoad?: boolean;
 };
+
+// Bundle note: this module handles filtering/search state; loading PromptGrid dynamically keeps initial hydration smaller.
+const PromptGrid = dynamic(() => import('./PromptGrid'), {
+  ssr: false,
+  loading: () => <PromptGridSkeleton />,
+});
 
 function normalize(text: string) {
   return text.toLowerCase();
@@ -128,10 +135,8 @@ export default function BrowseClient({ prompts, categories, isInitialLoad = fals
       {isMounted && (!isInitialLoad || filtered.length > 0) ? (
         <PromptGrid prompts={filtered} />
       ) : (
-        <PromptGrid prompts={[]} isLoading skeletonCount={6} />
+        <PromptGridSkeleton />
       )}
     </div>
   );
 }
-
-

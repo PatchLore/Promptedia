@@ -1,7 +1,7 @@
-import BrowseClient from '@/components/BrowseClient';
 import { buildPromptUrl } from '@/lib/slug';
 import WrapperClient from '@/app/WrapperClient';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import LazyBrowseClient from '@/components/LazyBrowseClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -164,7 +164,7 @@ export default async function BrowsePage({
         />
 
         <section className="py-8">
-          <BrowseClient
+          <LazyBrowseClient
             categories={categories}
             prompts={prompts || []}
             isInitialLoad={!prompts || prompts.length === 0}

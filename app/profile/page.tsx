@@ -2,8 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { supabase } from '@/lib/supabase/client';
 import { redirect } from 'next/navigation';
-import ProfileClient from './ProfileClient';
 import WrapperClient from '@/app/WrapperClient';
+import LazyProfileClient from './LazyProfileClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
 
@@ -55,7 +55,7 @@ export default async function ProfilePage() {
               Access your saved prompts in one place. Favorites stay in sync across devices as long as you&apos;re signed in.
             </p>
           </header>
-          <ProfileClient promptIds={promptIds} />
+          <LazyProfileClient promptIds={promptIds} />
         </div>
       </>
     </WrapperClient>

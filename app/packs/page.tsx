@@ -1,6 +1,6 @@
-import PacksClient from '@/components/PacksClient';
 import WrapperClient from '@/app/WrapperClient';
 import { promptPacks } from '@/lib/monetization';
+import LazyPacksClient from '@/components/LazyPacksClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,10 +69,12 @@ export default function PacksPage() {
             </ul>
           </section>
           <section className="py-8">
-            <PacksClient />
+          <LazyPacksClient />
           </section>
         </div>
       </>
     </WrapperClient>
   );
 }
+
+// PacksClient renders purchase CTAs; load it lazily to keep the shell hydration small.

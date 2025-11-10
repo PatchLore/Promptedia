@@ -1,6 +1,8 @@
 import { memo } from 'react';
 import PromptCard from './PromptCard';
 
+// Bundle note: PromptGrid renders many cards; memoization + lazy loading help prevent unnecessary client bundle growth.
+
 type PromptGridProps = {
   prompts: any[];
   isLoading?: boolean;
