@@ -10,6 +10,15 @@ const canonicalUrl = `${siteUrl}/packs`;
 export default function PacksPage() {
   const featuredPack = promptPacks[0];
 
+  const webPageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Premium AI Prompt Packs',
+    url: canonicalUrl,
+    description:
+      'Browse curated AI prompt packs for Midjourney, ChatGPT, Suno, Udio, and more creative tools.',
+  };
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -49,6 +58,11 @@ export default function PacksPage() {
         </head>
 
         <div className="container mx-auto max-w-screen-lg px-4 py-8 space-y-8">
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+          />
           <script
             type="application/ld+json"
             suppressHydrationWarning
