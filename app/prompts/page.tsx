@@ -3,6 +3,31 @@ export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import WrapperClient from '@/app/WrapperClient';
+import type { Metadata } from 'next';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+
+export const metadata: Metadata = {
+  title: 'All Prompts | On Point Prompt',
+  description: 'Explore every AI prompt available on On Point Prompt, organised by category and keyword.',
+  alternates: {
+    canonical: `${siteUrl}/prompts`,
+  },
+  openGraph: {
+    title: 'All Prompts | On Point Prompt',
+    description: 'Explore every AI prompt available on On Point Prompt, organised by category and keyword.',
+    url: `${siteUrl}/prompts`,
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
+  },
+};
+
+const collectionLdJson = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'All Prompts',
+  isPartOf: `${siteUrl}/prompts`,
+  url: `${siteUrl}/prompts`,
+};
 
 export default async function PromptsPage({
   searchParams,
@@ -40,6 +65,11 @@ export default async function PromptsPage({
 
   const content = (
     <div className="max-w-5xl mx-auto py-10 px-4">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLdJson) }}
+      />
       <h1 className="text-4xl font-bold mb-8">All Prompts</h1>
 
       <div className="flex flex-wrap gap-3 mb-8">

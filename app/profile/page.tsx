@@ -4,10 +4,22 @@ import { supabase } from '@/lib/supabase/client';
 import { redirect } from 'next/navigation';
 import ProfileClient from './ProfileClient';
 import WrapperClient from '@/app/WrapperClient';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'My Favorites - On Point Prompt',
-  description: 'View your saved favorite prompts',
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+
+export const metadata: Metadata = {
+  title: 'My Favorites | On Point Prompt',
+  description: 'View and manage your saved favourite AI prompts on On Point Prompt.',
+  alternates: {
+    canonical: `${siteUrl}/profile`,
+  },
+  openGraph: {
+    title: 'My Favorites | On Point Prompt',
+    description: 'View and manage your saved favourite AI prompts on On Point Prompt.',
+    url: `${siteUrl}/profile`,
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
+  },
 };
 
 export default async function ProfilePage() {

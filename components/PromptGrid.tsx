@@ -1,10 +1,11 @@
 import PromptCard from './PromptCard';
+import React from 'react';
 
 type PromptGridProps = {
   prompts: any[];
 };
 
-export default function PromptGrid({ prompts }: PromptGridProps) {
+function PromptGrid({ prompts }: PromptGridProps) {
   if (prompts.length === 0) {
     return (
       <div className="text-center py-12">
@@ -21,3 +22,5 @@ export default function PromptGrid({ prompts }: PromptGridProps) {
     </div>
   );
 }
+
+export default React.memo(PromptGrid);

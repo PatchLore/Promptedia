@@ -20,6 +20,7 @@ export default function PromptCard({ prompt }: PromptCardProps) {
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               unoptimized
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
             {prompt.category && (

@@ -4,6 +4,25 @@ import { supabase } from '@/lib/supabase/client';
 import PromptGrid from '@/components/PromptGrid';
 import Link from 'next/link';
 import WrapperClient from '@/app/WrapperClient';
+import type { Metadata } from 'next';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+
+export const metadata: Metadata = {
+  title: 'On Point Prompt — Discover AI Prompts & Inspiration',
+  description:
+    'Browse curated AI prompts for ChatGPT, Midjourney, and music generation. Discover inspiration daily with On Point Prompt.',
+  alternates: {
+    canonical: `${siteUrl}/`,
+  },
+  openGraph: {
+    title: 'On Point Prompt — Discover AI Prompts & Inspiration',
+    description:
+      'Browse curated AI prompts for ChatGPT, Midjourney, and music generation. Discover inspiration daily with On Point Prompt.',
+    url: `${siteUrl}/`,
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
+  },
+};
 
 const categories = [
   { name: 'Art', slug: 'art', icon: '🎨' },
@@ -12,6 +31,14 @@ const categories = [
   { name: 'Business', slug: 'business', icon: '💼' },
   { name: 'Coding', slug: 'coding', icon: '💻' },
 ];
+
+const websiteLdJson = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'On Point Prompt',
+  url: `${siteUrl}/`,
+};
+
 
 export default async function HomePage() {
   const { data: featuredPrompts } = await supabase
@@ -24,6 +51,11 @@ export default async function HomePage() {
 
   const content = (
     <div className="container mx-auto px-4 py-12">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLdJson) }}
+      />
       <section className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           On Point Prompt
@@ -45,6 +77,12 @@ export default async function HomePage() {
             Submit Prompt
           </Link>
         </div>
+      </section>
+
+      <section className="max-w-3xl mx-auto text-center mb-16 space-y-4 text-gray-600 dark:text-gray-400">
+        <p>On Point Prompt is your library of AI prompts for images, music, writing, coding, and business tools. Find creative inspiration instantly.</p>
+        <p>Search, filter, and save high-quality prompts built for Midjourney, Stable Diffusion, ChatGPT, Suno, Udio, and more. Updated regularly.</p>
+        <p>Start exploring trending AI prompts or dive into specific categories.</p>
       </section>
 
       <section className="mb-16">

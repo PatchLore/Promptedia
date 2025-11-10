@@ -179,6 +179,7 @@ export default function AdminTable({ prompts: initialPrompts }: AdminTableProps)
                             fill
                             className="object-cover"
                             sizes="(max-width: 768px) 100vw, 300px"
+                            loading="lazy"
                           />
                         </div>
                       )}
@@ -366,6 +367,7 @@ export default function AdminTable({ prompts: initialPrompts }: AdminTableProps)
                             fill
                             className="object-cover"
                             sizes="(max-width: 768px) 100vw, 300px"
+                            loading="lazy"
                           />
                         </div>
                       )}

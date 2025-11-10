@@ -2,13 +2,24 @@ import { supabase } from '@/lib/supabase/client';
 import BrowseClient from '@/components/BrowseClient';
 import PromptCardSkeleton from '@/components/PromptCardSkeleton';
 import { Suspense } from 'react';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { buildPromptUrl } from '@/lib/slug';
 import WrapperClient from '@/app/WrapperClient';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+
 export const metadata: Metadata = {
-  title: 'Browse Prompts - On Point Prompt',
-  description: 'Search and filter AI prompts by category, type, and keywords',
+  title: 'Browse Prompts | On Point Prompt',
+  description: 'Search and filter AI prompts by category, type, and keywords on On Point Prompt.',
+  alternates: {
+    canonical: `${siteUrl}/browse`,
+  },
+  openGraph: {
+    title: 'Browse Prompts | On Point Prompt',
+    description: 'Search and filter AI prompts by category, type, and keywords on On Point Prompt.',
+    url: `${siteUrl}/browse`,
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
+  },
 };
 
 export const dynamic = 'force-dynamic';
@@ -21,6 +32,29 @@ const categories = [
   { name: 'Business', slug: 'business' },
   { name: 'Coding', slug: 'coding' },
 ];
+
+const categoryContentMap: Record<string, { title: string; intro: string }> = {
+  art: {
+    title: 'Art Prompts',
+    intro: 'Explore AI art prompts for Midjourney, Stable Diffusion, and other image generators to spark visual creativity.',
+  },
+  music: {
+    title: 'Music Prompts',
+    intro: 'Discover AI music generation prompts for Suno, Udio, and SoundSwoop. Create melodies and soundscapes instantly.',
+  },
+  writing: {
+    title: 'Writing Prompts',
+    intro: 'Browse creative writing prompts inspired by AI storytelling to craft narratives, dialogue, and more.',
+  },
+  business: {
+    title: 'Business Prompts',
+    intro: 'Find powerful business prompts for sales scripts, marketing copy, and data-driven analysis with AI.',
+  },
+  coding: {
+    title: 'Coding Prompts',
+    intro: 'AI coding prompts for debugging, code generation, refactoring, and learning new languages faster.',
+  },
+};
 
 export default async function BrowsePage({
   searchParams,
@@ -48,9 +82,21 @@ export default async function BrowsePage({
     console.error('Supabase query error:', error);
   }
 
+  const normalizedCategory = category.toLowerCase();
+  const categoryCopy = categoryContentMap[normalizedCategory];
+
   const content = (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">Browse Prompts</h1>
+      <header className="mb-8 space-y-2">
+        <h1 className="text-4xl font-bold">
+          {categoryCopy ? categoryCopy.title : 'Browse Prompts'}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300">
+          {categoryCopy
+            ? categoryCopy.intro
+            : 'Search and filter AI prompts across every category, from art and music to business and coding.'}
+        </p>
+      </header>
 
       <div className="mb-6">
         <a

@@ -109,6 +109,7 @@ export default function UnsplashImageButton({ title, category, onImageSelected }
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 200px"
+              loading="lazy"
             />
           </div>
           <button
