@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import PromptGrid from './PromptGrid';
 import SearchBar from './SearchBar';
@@ -34,6 +34,11 @@ function fuzzyMatch(haystack: string, needle: string) {
 export default function BrowseClient({ prompts, categories }: BrowseClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const search = searchParams.get('search') || '';
   const category = searchParams.get('category') || 'all';
@@ -96,21 +101,38 @@ export default function BrowseClient({ prompts, categories }: BrowseClientProps)
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center gap-4">
-        <div className="flex-1"><SearchBar /></div>
-        <div className="w-full md:w-56"><SortDropdown /></div>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center">
+        <div className="flex-1">
+          <SearchBar />
+        </div>
+        <div className="w-full md:w-56">
+          <SortDropdown />
+        </div>
       </div>
 
       <TagFilter categories={categories} currentCategory={category} />
 
       <TagChips />
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600 dark:text-gray-400">{filtered.length} results</p>
-        <button onClick={clearAll} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Clear all</button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-gray-400 dark:text-gray-300">{filtered.length} results</p>
+        <button
+          onClick={clearAll}
+          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm w-full sm:w-auto"
+        >
+          Clear filters
+        </button>
       </div>
 
-      <PromptGrid prompts={filtered} />
+      {isMounted ? (
+        <PromptGrid prompts={filtered} />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="animate-pulse rounded-xl bg-gray-800/50 h-48" />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

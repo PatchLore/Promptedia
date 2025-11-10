@@ -21,6 +21,8 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
     notFound();
   }
 
+  const canonicalUrl = `${siteUrl}/prompts/${prompt.slug}`;
+
   let relatedPrompts: { title: string | null; slug: string }[] = [];
 
   if (prompt.category) {
@@ -33,70 +35,130 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
       .limit(3);
 
     if (!relatedError && relatedData) {
-      relatedPrompts = relatedData.filter((item): item is { title: string | null; slug: string } => Boolean(item.slug))
+      relatedPrompts = relatedData
+        .filter((item): item is { title: string | null; slug: string } => Boolean(item.slug))
         .map(({ title, slug }) => ({ title, slug }));
     }
   }
 
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: prompt.title,
+    description: prompt.description || '',
+    url: canonicalUrl,
+    image: prompt.thumbnail_url || prompt.example_url || `${siteUrl}/og.png`,
+    datePublished: prompt.created_at || undefined,
+    dateModified: prompt.updated_at || undefined,
+    inLanguage: 'en',
+  };
+
   const content = (
-    <div className="max-w-3xl mx-auto py-12 px-6">
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'CreativeWork',
-            name: prompt.title,
-            description: prompt.description || '',
-            url: `${siteUrl}/prompts/${prompt.slug}`,
-            image: prompt.example_url || undefined,
-            datePublished: prompt.created_at || '',
-            inLanguage: 'en',
-          }),
-        }}
-      />
-      <h1 className="text-4xl font-bold mb-6 text-white">{prompt.title}</h1>
+    <>
+      <head>
+        <title>{`${prompt.title} | On Point Prompt`}</title>
+        <meta
+          name="description"
+          content={
+            prompt.description ||
+            `Discover the ${prompt.title} prompt on On Point Prompt and use it in your next AI project.`
+          }
+        />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={`${prompt.title} | On Point Prompt`} />
+        <meta
+          property="og:description"
+          content={
+            prompt.description ||
+            `Explore the ${prompt.title} prompt and apply it to your AI workflow.`
+          }
+        />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={prompt.thumbnail_url || prompt.example_url || `${siteUrl}/og.png`} />
+        <meta property="og:type" content="article" />
+      </head>
 
-      {prompt.description && (
-        <p className="text-gray-300 text-lg mb-8">{prompt.description}</p>
-      )}
+      <div className="container mx-auto max-w-screen-lg px-4 py-8">
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schema),
+          }}
+        />
 
-      {prompt.prompt && (
-        <div className="bg-gray-900/60 border border-gray-700 rounded-lg p-6 mb-10">
-          <h2 className="text-xl font-semibold mb-3 text-white">Prompt</h2>
-          <pre className="text-gray-200 whitespace-pre-wrap leading-relaxed mb-4">
-            {prompt.prompt}
-          </pre>
-          <button
-            onClick={() => navigator.clipboard.writeText(prompt.prompt ?? '')}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition-colors text-white rounded-md"
-          >
-            Copy Prompt
-          </button>
-        </div>
-      )}
+        <header className="py-8">
+          <h1 className="text-4xl font-bold mb-8 text-white">{prompt.title}</h1>
+          {prompt.description && (
+            <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+              {prompt.description}
+            </p>
+          )}
+        </header>
 
-      <div className="text-sm text-gray-400 mt-4">
-        <span className="font-medium text-gray-300">Category:</span>{' '}
-        {prompt.category || 'Uncategorised'}
-      </div>
+        {prompt.prompt && (
+          <section className="py-8">
+            <h2 className="text-xl font-semibold mb-4 text-white">Prompt</h2>
+            <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-sm">
+              <pre className="text-gray-200 whitespace-pre-wrap text-base leading-relaxed mb-6">
+                {prompt.prompt}
+              </pre>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => navigator.clipboard.writeText(prompt.prompt ?? '')}
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm"
+                >
+                  Copy Prompt
+                </button>
+                {prompt.example_url && (
+                  <a
+                    href={prompt.example_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm text-center"
+                  >
+                    Open Example
+                  </a>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
-      {relatedPrompts.length > 0 && (
-        <section className="mt-12">
-          <h3 className="text-xl font-bold mb-4">Related Prompts</h3>
-          <ul className="space-y-2">
-            {relatedPrompts.map((related) => (
-              <li key={related.slug}>
-                <Link href={`/prompts/${related.slug}`} className="text-blue-600 hover:underline">
-                  {related.title || 'Untitled Prompt'}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <section className="py-8">
+          <h2 className="text-xl font-semibold mb-4 text-white">Prompt Details</h2>
+          <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-sm text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+            <p>
+              <span className="text-white font-medium">Category:</span>{' '}
+              {prompt.category || 'Uncategorised'}
+            </p>
+            {prompt.model && (
+              <p className="mt-3">
+                <span className="text-white font-medium">Model:</span> {prompt.model}
+              </p>
+            )}
+          </div>
         </section>
-      )}
-    </div>
+
+        {relatedPrompts.length > 0 && (
+          <section className="py-8">
+            <h3 className="text-xl font-semibold mb-4 text-white">Related Prompts</h3>
+            <ul className="space-y-3">
+              {relatedPrompts.map((related) => (
+                <li key={related.slug}>
+                  <Link
+                    href={`/prompts/${related.slug}`}
+                    className="text-blue-400 hover:text-blue-300 transition"
+                  >
+                    {related.title || 'Untitled Prompt'}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </>
   );
 
   return <WrapperClient>{content}</WrapperClient>;

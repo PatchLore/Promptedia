@@ -44,7 +44,18 @@ export default async function BrowsePage({
 }) {
   const search = searchParams?.search ?? '';
   const category = searchParams?.category ?? 'all';
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+  const baseUrl = siteUrl;
+
+  const queryParams = new URLSearchParams();
+  if (search) {
+    queryParams.set('search', search);
+  }
+  if (category !== 'all') {
+    queryParams.set('category', category);
+  }
+  const queryString = queryParams.toString();
+  const canonicalUrl = `${siteUrl}/browse${queryString ? `?${queryString}` : ''}`;
 
   let query = supabase
     .from('prompts')
@@ -66,51 +77,83 @@ export default async function BrowsePage({
   const normalizedCategory = category.toLowerCase();
   const categoryCopy = categoryContentMap[normalizedCategory];
 
+  const itemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: categoryCopy ? `${categoryCopy.title} - On Point Prompt` : 'Browse Prompts - On Point Prompt',
+    url: canonicalUrl,
+    itemListElement: (prompts || []).map((p: any, idx: number) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      url: buildPromptUrl(siteUrl, p),
+      name: p.title || 'Prompt',
+    })),
+  };
+
   const content = (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-8 space-y-2">
-        <h1 className="text-4xl font-bold">
-          {categoryCopy ? categoryCopy.title : 'Browse Prompts'}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          {categoryCopy
-            ? categoryCopy.intro
-            : 'Search and filter AI prompts across every category, from art and music to business and coding.'}
-        </p>
-      </header>
+    <>
+      <head>
+        <title>{categoryCopy ? `${categoryCopy.title} | On Point Prompt` : 'Browse Prompts | On Point Prompt'}</title>
+        <meta
+          name="description"
+          content={
+            categoryCopy
+              ? categoryCopy.intro
+              : 'Search and filter AI prompts across art, music, writing, business, and coding categories.'
+          }
+        />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta
+          property="og:title"
+          content={categoryCopy ? `${categoryCopy.title} | On Point Prompt` : 'Browse Prompts | On Point Prompt'}
+        />
+        <meta
+          property="og:description"
+          content={
+            categoryCopy
+              ? categoryCopy.intro
+              : 'Search and filter AI prompts across art, music, writing, business, and coding categories.'
+          }
+        />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={`${siteUrl}/og.png`} />
+        <meta property="og:type" content="website" />
+      </head>
 
-      <div className="mb-6">
-        <a
-          href="/packs"
-          className="block w-full text-center px-4 py-3 rounded-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:scale-105 transition"
-        >
-          💡 Want all 100+ prompts in one pack? → Get the Creator Bundle
-        </a>
+      <div className="container mx-auto max-w-screen-lg px-4 py-8">
+        <header className="py-8 space-y-4">
+          <h1 className="text-4xl font-bold text-white">
+            {categoryCopy ? categoryCopy.title : 'Browse Prompts'}
+          </h1>
+          <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+            {categoryCopy
+              ? categoryCopy.intro
+              : 'Search and filter AI prompts across every category, from art and music to business and coding.'}
+          </p>
+        </header>
+
+        <section className="py-8">
+          <a
+            href="/packs"
+            className="block w-full rounded-lg border border-gray-800 bg-gray-900/60 px-4 py-3 text-center text-white shadow-sm transition hover:bg-gray-900"
+          >
+            💡 Want all 100+ prompts in one pack? → Get the Creator Bundle
+          </a>
+        </section>
+
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(itemListSchema),
+          }}
+        />
+
+        <section className="py-8">
+          <BrowseClient categories={categories} prompts={prompts || []} />
+        </section>
       </div>
-
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'ItemList',
-            name: category === 'all' ? 'All Prompts' : `${category} Prompts`,
-            itemListOrder: 'https://schema.org/ItemListOrderAscending',
-            numberOfItems: (prompts || []).length,
-            itemListElement: (prompts || []).map((p: any, idx: number) => ({
-              '@type': 'ListItem',
-              position: idx + 1,
-              url: buildPromptUrl(baseUrl, p),
-              name: p.title || 'Prompt',
-              ...(p.example_url ? { image: p.example_url } : {}),
-            })),
-          }),
-        }}
-      />
-
-      <BrowseClient categories={categories} prompts={prompts || []} />
-    </div>
+    </>
   );
 
   return <WrapperClient>{content}</WrapperClient>;

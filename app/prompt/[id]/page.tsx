@@ -4,6 +4,8 @@ import WrapperClient from '@/app/WrapperClient';
 
 export const dynamic = 'force-dynamic';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+
 type PromptRecord = { id?: string; slug?: string | null; [key: string]: any };
 
 export default async function LegacyPromptRedirect({
@@ -11,6 +13,8 @@ export default async function LegacyPromptRedirect({
 }: {
   params: { id: string };
 }) {
+  const canonicalUrl = `${siteUrl}/prompt/${params.id}`;
+
   const { data, error } = await supabase
     .from('prompts')
     .select('slug')
@@ -23,5 +27,25 @@ export default async function LegacyPromptRedirect({
 
   redirect(`/prompts/${data.slug}`);
 
-  return <WrapperClient>{null}</WrapperClient>;
+  return (
+    <>
+      <head>
+        <title>Redirecting… | On Point Prompt</title>
+        <meta
+          name="description"
+          content="This legacy prompt route has moved to a new slug-based URL."
+        />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content="Redirecting… | On Point Prompt" />
+        <meta
+          property="og:description"
+          content="This prompt now lives on a new slug-based page on On Point Prompt."
+        />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={`${siteUrl}/og.png`} />
+        <meta property="og:type" content="website" />
+      </head>
+      <WrapperClient>{null}</WrapperClient>
+    </>
+  );
 }

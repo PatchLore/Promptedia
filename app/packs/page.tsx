@@ -3,28 +3,64 @@ import WrapperClient from '@/app/WrapperClient';
 
 export const dynamic = 'force-dynamic';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+const canonicalUrl = `${siteUrl}/packs`;
+
 export default function PacksPage() {
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Premium AI Prompt Packs',
+    url: canonicalUrl,
+    description:
+      'Browse premium AI prompt packs curated for Midjourney, ChatGPT, Suno, Udio, and more creative tools.',
+  };
+
   return (
     <WrapperClient>
-      <section className="max-w-3xl mx-auto mb-8 text-gray-600 dark:text-gray-400 space-y-4">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Premium AI Prompt Packs &amp; Creator Bundles</h2>
-        <p>
-          Discover AI prompt bundles tailored for image generation, music creation, and high-impact ChatGPT prompts. These AI prompt packs include
-          100+ ready-to-use prompts to help creators move faster and produce consistent results across every workflow.
-        </p>
-        <p>
-          Unlock professionally crafted prompts that save time, eliminate guesswork, and empower your next project—whether you're designing visuals,
-          producing audio, or writing copy.
-        </p>
-        <ul className="list-disc list-inside space-y-1 text-sm">
-          <li>Save time with curated prompt bundles</li>
-          <li>Download 100+ prompts instantly</li>
-          <li>Boost content creation with proven prompt formulas</li>
-        </ul>
-      </section>
-      <PacksClient />
+      <>
+        <head>
+          <title>Premium Prompt Packs | On Point Prompt</title>
+          <meta
+            name="description"
+            content="Browse premium AI prompt packs curated for Midjourney, ChatGPT, Suno, Udio, and more. Download ready-to-use prompts and accelerate your workflow."
+          />
+          <link rel="canonical" href={canonicalUrl} />
+          <meta property="og:title" content="Premium Prompt Packs | On Point Prompt" />
+          <meta
+            property="og:description"
+            content="Discover curated AI prompt bundles for images, music, writing, coding, and business tasks. Unlock 100+ ready-to-use prompts instantly."
+          />
+          <meta property="og:url" content={canonicalUrl} />
+          <meta property="og:image" content={`${siteUrl}/og.png`} />
+          <meta property="og:type" content="website" />
+        </head>
+
+        <div className="container mx-auto max-w-screen-lg px-4 py-8 space-y-8">
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+          />
+          <section className="mx-auto max-w-3xl py-8 space-y-6">
+            <h1 className="text-4xl font-bold mb-8 text-white">Premium AI Prompt Packs</h1>
+            <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+              Discover AI prompt bundles tailored for image generation, music creation, and high-impact ChatGPT workflows. Download ready-to-use prompts and accelerate your projects.
+            </p>
+            <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+              Each pack is curated by creators and constantly refined for the latest AI tools. Save time, unlock new ideas, and eliminate guesswork in your creative process.
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+              <li>Save time with curated prompt bundles</li>
+              <li>Download 100+ prompts instantly</li>
+              <li>Boost content creation with proven prompt formulas</li>
+            </ul>
+          </section>
+          <section className="py-8">
+            <PacksClient />
+          </section>
+        </div>
+      </>
     </WrapperClient>
   );
 }
-
-

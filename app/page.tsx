@@ -6,6 +6,7 @@ import Link from 'next/link';
 import WrapperClient from '@/app/WrapperClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+const canonicalUrl = `${siteUrl}/`;
 
 const categories = [
   { name: 'Art', slug: 'art', icon: '🎨' },
@@ -14,13 +15,6 @@ const categories = [
   { name: 'Business', slug: 'business', icon: '💼' },
   { name: 'Coding', slug: 'coding', icon: '💻' },
 ];
-
-const websiteLdJson = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'On Point Prompt',
-  url: `${siteUrl}/`,
-};
 
 export default async function HomePage() {
   const { data: featuredPrompts } = await supabase
@@ -31,71 +25,104 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(12);
 
+  const websiteLdJson = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'On Point Prompt',
+    url: canonicalUrl,
+    description:
+      'On Point Prompt curates AI prompts for images, music, writing, coding, and business workflows.',
+  };
+
   const content = (
-    <div className="container mx-auto px-4 py-12">
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLdJson) }}
-      />
-      <section className="text-center mb-16">
-        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          On Point Prompt
-        </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-          Discover, search, and save AI prompts for image generation, music creation, writing, and more.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Link
-            href="/browse"
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
-          >
-            Browse Prompts
-          </Link>
-          <Link
-            href="/create"
-            className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-          >
-            Submit Prompt
-          </Link>
-        </div>
-      </section>
+    <>
+      <head>
+        <title>On Point Prompt — Discover AI Prompts &amp; Inspiration</title>
+        <meta
+          name="description"
+          content="Browse curated AI prompts for ChatGPT, Midjourney, music generation, and more. Discover inspiration daily with On Point Prompt."
+        />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content="On Point Prompt — Discover AI Prompts & Inspiration" />
+        <meta
+          property="og:description"
+          content="Explore curated prompts for ChatGPT, Midjourney, Suno, and other AI tools. Save your favorites and level up your creativity."
+        />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={`${siteUrl}/og.png`} />
+        <meta property="og:type" content="website" />
+      </head>
 
-      <section className="max-w-3xl mx-auto text-center mb-16 space-y-4 text-gray-600 dark:text-gray-400">
-        <p>On Point Prompt is your library of AI prompts for images, music, writing, coding, and business tools. Find creative inspiration instantly.</p>
-        <p>Search, filter, and save high-quality prompts built for Midjourney, Stable Diffusion, ChatGPT, Suno, Udio, and more. Updated regularly.</p>
-        <p>Start exploring trending AI prompts or dive into specific categories.</p>
-      </section>
+      <div className="container mx-auto max-w-screen-lg px-4 py-8">
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLdJson) }}
+        />
 
-      <section className="mb-16">
-        <h2 className="text-3xl font-bold mb-6 text-center">Browse by Category</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {categories.map((category) => (
+        <section className="py-8 text-center">
+          <h1 className="text-4xl font-bold mb-8 text-white">On Point Prompt</h1>
+          <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed mb-6 max-w-2xl mx-auto">
+            Discover, search, and save AI prompts for image generation, music creation, writing, and more.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              key={category.slug}
-              href={`/browse?category=${category.slug}`}
-              className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow text-center"
+              href="/browse"
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm"
             >
-              <div className="text-4xl mb-2">{category.icon}</div>
-              <div className="font-semibold">{category.name}</div>
+              Browse Prompts
             </Link>
-          ))}
-        </div>
-      </section>
+            <Link
+              href="/create"
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm"
+            >
+              Submit Prompt
+            </Link>
+          </div>
+        </section>
 
-      <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">Featured Prompts</h2>
-          <Link
-            href="/browse"
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            View All →
-          </Link>
-        </div>
-        <PromptGrid prompts={featuredPrompts || []} />
-      </section>
-    </div>
+        <section className="py-8 text-center space-y-4">
+          <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+            On Point Prompt is your library of AI prompts for images, music, writing, coding, and business tools. Find creative inspiration instantly.
+          </p>
+          <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+            Search, filter, and save high-quality prompts built for Midjourney, Stable Diffusion, ChatGPT, Suno, Udio, and more. Updated regularly.
+          </p>
+          <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+            Start exploring trending AI prompts or dive into specific categories.
+          </p>
+        </section>
+
+        <section className="py-8">
+          <h2 className="text-xl font-semibold mb-4 text-white text-center">Browse by Category</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {categories.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/browse?category=${category.slug}`}
+                className="rounded-lg border border-gray-800 bg-gray-900/60 p-6 text-center shadow-sm transition hover:bg-gray-900"
+              >
+                <div className="text-3xl mb-3">{category.icon}</div>
+                <div className="font-semibold text-white">{category.name}</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="py-8">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+            <h2 className="text-xl font-semibold text-white">Featured Prompts</h2>
+            <Link
+              href="/browse"
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm"
+            >
+              View All Prompts
+            </Link>
+          </div>
+          <PromptGrid prompts={featuredPrompts || []} />
+        </section>
+      </div>
+    </>
   );
 
   return <WrapperClient>{content}</WrapperClient>;

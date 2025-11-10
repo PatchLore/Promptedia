@@ -52,17 +52,19 @@ export default function ProfileClient({ promptIds }: ProfileClientProps) {
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 dark:text-gray-400 text-lg">Loading favorites…</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, idx) => (
+          <div key={idx} className="animate-pulse rounded-xl bg-gray-800/50 h-48" />
+        ))}
       </div>
     );
   }
 
   if (prompts.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 dark:text-gray-400 text-lg">
-          You haven't saved any favorites yet. Start browsing prompts and save the ones you like!
+      <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-8 text-center">
+        <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+          You haven&apos;t saved any favorites yet. Start browsing prompts and save the ones you like!
         </p>
       </div>
     );
