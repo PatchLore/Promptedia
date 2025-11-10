@@ -73,6 +73,14 @@ export default async function BrowsePage({
 
   const { data: prompts, error } = await query.order('created_at', { ascending: false });
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DB]', 'browse_prompts', {
+      category,
+      search,
+      results: prompts?.length ?? 0,
+    });
+  }
+
   if (error) {
     console.error('Supabase query error:', error);
   }
@@ -80,16 +88,19 @@ export default async function BrowsePage({
   const normalizedCategory = category.toLowerCase();
   const categoryCopy = categoryContentMap[normalizedCategory];
 
-  const itemListSchema = {
+  const collectionSchema = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
+    '@type': 'CollectionPage',
     name: categoryCopy ? `${categoryCopy.title} - On Point Prompt` : 'Browse Prompts - On Point Prompt',
     url: canonicalUrl,
-    itemListElement: (prompts || []).map((p: any, idx: number) => ({
-      '@type': 'ListItem',
-      position: idx + 1,
-      url: buildPromptUrl(siteUrl, p),
+    description:
+      categoryCopy?.intro ||
+      'Search and filter AI prompts across art, music, writing, business, and coding categories.',
+    hasPart: (prompts || []).slice(0, 20).map((p: any) => ({
+      '@type': 'CreativeWork',
       name: p.title || 'Prompt',
+      url: buildPromptUrl(siteUrl, p),
+      datePublished: p.created_at ? new Date(p.created_at).toISOString() : undefined,
     })),
   };
 
@@ -148,12 +159,16 @@ export default async function BrowsePage({
           type="application/ld+json"
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(itemListSchema),
+            __html: JSON.stringify(collectionSchema),
           }}
         />
 
         <section className="py-8">
-          <BrowseClient categories={categories} prompts={prompts || []} />
+          <BrowseClient
+            categories={categories}
+            prompts={prompts || []}
+            isInitialLoad={!prompts || prompts.length === 0}
+          />
         </section>
       </div>
     </>

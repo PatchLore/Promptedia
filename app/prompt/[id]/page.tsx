@@ -22,6 +22,14 @@ export default async function LegacyPromptRedirect({
     .eq('id', params.id)
     .single<PromptRecord>();
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DB]', 'legacy_prompt_redirect', {
+      id: params.id,
+      foundSlug: data?.slug ?? null,
+      hadError: Boolean(error),
+    });
+  }
+
   if (error || !data?.slug) {
     redirect('/prompts');
   }

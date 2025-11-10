@@ -18,6 +18,12 @@ export default async function AdminPage() {
     )
     .order('created_at', { ascending: false });
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DB]', 'admin_prompts', {
+      results: prompts?.length ?? 0,
+    });
+  }
+
   if (error) {
     console.error('Error fetching prompts:', error);
   }

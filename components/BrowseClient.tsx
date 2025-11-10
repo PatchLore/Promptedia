@@ -11,6 +11,7 @@ import TagChips from './TagChips';
 type BrowseClientProps = {
   prompts: any[];
   categories: { name: string; slug: string }[];
+  isInitialLoad?: boolean;
 };
 
 function normalize(text: string) {
@@ -31,7 +32,7 @@ function fuzzyMatch(haystack: string, needle: string) {
   return false;
 }
 
-export default function BrowseClient({ prompts, categories }: BrowseClientProps) {
+export default function BrowseClient({ prompts, categories, isInitialLoad = false }: BrowseClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
@@ -124,14 +125,10 @@ export default function BrowseClient({ prompts, categories }: BrowseClientProps)
         </button>
       </div>
 
-      {isMounted ? (
+      {isMounted && (!isInitialLoad || filtered.length > 0) ? (
         <PromptGrid prompts={filtered} />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <div key={idx} className="animate-pulse rounded-xl bg-gray-800/50 h-48" />
-          ))}
-        </div>
+        <PromptGrid prompts={[]} isLoading skeletonCount={6} />
       )}
     </div>
   );

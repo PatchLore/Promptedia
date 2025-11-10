@@ -1,5 +1,6 @@
 import PacksClient from '@/components/PacksClient';
 import WrapperClient from '@/app/WrapperClient';
+import { promptPacks } from '@/lib/monetization';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,13 +8,24 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.c
 const canonicalUrl = `${siteUrl}/packs`;
 
 export default function PacksPage() {
-  const collectionSchema = {
+  const featuredPack = promptPacks[0];
+
+  const productSchema = {
     '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: 'Premium AI Prompt Packs',
-    url: canonicalUrl,
+    '@type': 'Product',
+    name: featuredPack?.title ?? 'Premium AI Prompt Pack',
     description:
-      'Browse premium AI prompt packs curated for Midjourney, ChatGPT, Suno, Udio, and more creative tools.',
+      featuredPack?.summary ??
+      'Curated AI prompts designed to accelerate your creative workflow across popular tools.',
+    image: `${siteUrl}/og.png`,
+    offers: {
+      '@type': 'Offer',
+      price: featuredPack?.price?.replace(/[^0-9.]/g, '') || '10.00',
+      priceCurrency: 'USD',
+      url: featuredPack?.url ?? canonicalUrl,
+      availability: 'https://schema.org/InStock',
+    },
+    url: canonicalUrl,
   };
 
   return (
@@ -40,7 +52,7 @@ export default function PacksPage() {
           <script
             type="application/ld+json"
             suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
           />
           <section className="mx-auto max-w-3xl py-8 space-y-6">
             <h1 className="text-4xl font-bold mb-8 text-white">Premium AI Prompt Packs</h1>

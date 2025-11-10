@@ -1,8 +1,8 @@
 import type { PromptRow } from '@/lib/supabase/client';
 import { notFound } from 'next/navigation';
 import WrapperClient from '@/app/WrapperClient';
-import Link from 'next/link';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import RelatedPromptsClient from './RelatedPromptsClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,25 +26,14 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
     notFound();
   }
 
-  const canonicalUrl = `${siteUrl}/prompts/${prompt.slug}`;
-
-  let relatedPrompts: { title: string | null; slug: string }[] = [];
-
-  if (prompt.category) {
-    const { data: relatedData, error: relatedError } = await supabase
-      .from('prompts')
-      .select('title, slug')
-      .eq('category', prompt.category)
-      .neq('slug', prompt.slug)
-      .order('created_at', { ascending: false })
-      .limit(3);
-
-    if (!relatedError && relatedData) {
-      relatedPrompts = relatedData
-        .filter((item): item is { title: string | null; slug: string } => Boolean(item.slug))
-        .map(({ title, slug }) => ({ title, slug }));
-    }
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DB]', 'prompt_detail', {
+      slug: params.slug,
+      category: prompt.category,
+    });
   }
+
+  const canonicalUrl = `${siteUrl}/prompts/${prompt.slug}`;
 
   const schema = {
     '@context': 'https://schema.org',
@@ -145,21 +134,10 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
           </div>
         </section>
 
-        {relatedPrompts.length > 0 && (
+        {prompt.category && (
           <section className="py-8">
             <h3 className="text-xl font-semibold mb-4 text-white">Related Prompts</h3>
-            <ul className="space-y-3">
-              {relatedPrompts.map((related) => (
-                <li key={related.slug}>
-                  <Link
-                    href={`/prompts/${related.slug}`}
-                    className="text-blue-400 hover:text-blue-300 transition"
-                  >
-                    {related.title || 'Untitled Prompt'}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <RelatedPromptsClient category={prompt.category} excludeSlug={prompt.slug} />
           </section>
         )}
       </div>

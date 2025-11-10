@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get('search') ?? searchParams.get('q');
   const limitParam = searchParams.get('limit');
   const includePrivate = searchParams.get('includePrivate') === 'true';
+  const excludeSlug = searchParams.get('exclude');
 
   const ids = idsParam
     ? idsParam
@@ -64,8 +65,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  const filtered = excludeSlug
+    ? (data ?? []).filter((prompt) => prompt.slug !== excludeSlug)
+    : data ?? [];
+
   return NextResponse.json(
-    { prompts: data ?? [] },
+    { prompts: filtered },
     {
       headers: {
         'Cache-Control': CACHE_CONTROL,

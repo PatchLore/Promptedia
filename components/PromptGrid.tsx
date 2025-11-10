@@ -1,5 +1,5 @@
+import { memo } from 'react';
 import PromptCard from './PromptCard';
-import React from 'react';
 
 type PromptGridProps = {
   prompts: any[];
@@ -47,4 +47,4 @@ function PromptGrid({ prompts, isLoading = false, skeletonCount = 6 }: PromptGri
   );
 }
 
-export default React.memo(PromptGrid);
+export default memo(PromptGrid);

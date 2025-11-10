@@ -29,9 +29,37 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(12);
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DB]', 'featured_prompts', {
+      filters: { is_public: true, is_pro: false },
+      limit: 12,
+    });
+  }
+
   if (featuredError && process.env.NODE_ENV === 'development') {
     console.error('Failed to load featured prompts', featuredError);
   }
+
+  const applyImageTransforms = (url?: string | null) => {
+    if (!url || url.startsWith('data:')) return null;
+    try {
+      const parsed = new URL(url);
+      parsed.searchParams.set('w', parsed.searchParams.get('w') ?? '400');
+      parsed.searchParams.set('q', '70');
+      parsed.searchParams.set('auto', parsed.searchParams.get('auto') ?? 'format');
+      return parsed.toString();
+    } catch {
+      return `${url}${url.includes('?') ? '&' : '?'}w=400&q=70&auto=format`;
+    }
+  };
+
+  const preloadImages =
+    featuredPrompts
+      ?.slice(0, 3)
+      .map((prompt) =>
+        applyImageTransforms(prompt.thumbnail_url || prompt.example_url || undefined)
+      )
+      .filter((href): href is string => Boolean(href)) ?? [];
 
   const websiteLdJson = {
     '@context': 'https://schema.org',
@@ -59,6 +87,9 @@ export default async function HomePage() {
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:image" content={`${siteUrl}/og.png`} />
         <meta property="og:type" content="website" />
+        {preloadImages.map((href) => (
+          <link key={href} rel="preload" as="image" href={href} />
+        ))}
       </head>
 
       <div className="container mx-auto max-w-screen-lg px-4 py-8">

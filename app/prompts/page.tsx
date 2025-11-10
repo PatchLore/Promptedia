@@ -42,6 +42,14 @@ export default async function PromptsPage({
 
   const { data: prompts, error } = await query;
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[DB]', 'prompts_index', {
+      search,
+      category,
+      results: prompts?.length ?? 0,
+    });
+  }
+
   const head = (
     <head>
       <title>All Prompts | On Point Prompt</title>
@@ -90,14 +98,16 @@ export default async function PromptsPage({
 
   const collectionLdJson = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
+    '@type': 'CollectionPage',
     name: 'All Prompts',
     url: canonicalUrl,
-    itemListElement: (prompts || []).map((prompt, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: `${siteUrl}/prompts/${prompt.slug}`,
+    description:
+      'Explore AI prompts for writing, art, coding, music, and business. Filter by category or keyword to find the right inspiration.',
+    hasPart: prompts.slice(0, 20).map((prompt) => ({
+      '@type': 'CreativeWork',
       name: prompt.title || 'Prompt',
+      url: `${siteUrl}/prompts/${prompt.slug}`,
+      datePublished: prompt.created_at ? new Date(prompt.created_at).toISOString() : undefined,
     })),
   };
 
