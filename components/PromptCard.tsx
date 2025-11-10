@@ -32,6 +32,7 @@ export default function PromptCard({ prompt }: PromptCardProps) {
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-cover"
+                mode="card"
               />
               {hasPreview ? (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />

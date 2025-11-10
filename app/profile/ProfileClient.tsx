@@ -1,53 +1,99 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
+import { supabase } from '@/lib/supabase/client';
 import type { PromptRow } from '@/lib/supabase/client';
+import { PromptGridSkeleton } from '@/components/LazyPromptGrid';
 
-interface ProfileClientProps {
-  promptIds: string[];
-}
-
-// Lazy-load PromptGrid to avoid shipping the entire favorites grid on initial render.
+// Bundle note: we keep PromptGrid lazily loaded to avoid hydrating the entire favorites grid upfront.
 const PromptGrid = dynamic(() => import('@/components/PromptGrid'), {
   ssr: false,
   loading: () => <PromptGridSkeleton />,
 });
 
-export default function ProfileClient({ promptIds }: ProfileClientProps) {
-  const fetchKey = useMemo(() => {
-    if (promptIds.length === 0) {
-      return null;
-    }
-    const query = encodeURIComponent(promptIds.join(','));
-    return `/api/prompts?ids=${query}&includePrivate=true`;
-  }, [promptIds]);
+const fetchFavorites = async (userId: string) => {
+  const response = await fetch(`/api/favorites?userId=${userId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to load favorites: ${response.statusText}`);
+  }
+  return (await response.json()) as { promptIds: string[] };
+};
 
-  const fetcher = (url: string) =>
-    fetch(url).then((response) => {
-      if (!response.ok) {
-        throw new Error(`Failed to load favorites: ${response.statusText}`);
+const fetchPrompts = async (promptIds: string[]) => {
+  if (promptIds.length === 0) {
+    return { prompts: [] };
+  }
+
+  const query = encodeURIComponent(promptIds.join(','));
+  const response = await fetch(`/api/prompts?ids=${query}&includePrivate=true`);
+  if (!response.ok) {
+    throw new Error(`Failed to load prompt details: ${response.statusText}`);
+  }
+  return (await response.json()) as { prompts: PromptRow[] };
+};
+
+export default function ProfileClient() {
+  const router = useRouter();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      const id = data.user?.id ?? null;
+      if (!id) {
+        router.replace('/');
       }
-      return response.json() as Promise<{ prompts: PromptRow[] }>;
+      setUserId(id);
+      setCheckingAuth(false);
     });
+  }, [router]);
 
-  const { data, isLoading, error } = useSWR(fetchKey, fetcher, {
-    revalidateOnFocus: false,
-    dedupingInterval: 30_000,
-    fallbackData: { prompts: [] },
-    keepPreviousData: true,
-  });
-
-  if (isLoading) {
+  if (!checkingAuth && !userId) {
     return <PromptGridSkeleton />;
   }
 
-  if (error) {
-    console.error('Error loading favorite prompts:', error);
+  const {
+    data: favoritesData,
+    isLoading: favoritesLoading,
+    error: favoritesError,
+  } = useSWR(userId ? ['favorites', userId] : null, () => fetchFavorites(userId!), {
+    revalidateOnFocus: false,
+    dedupingInterval: 30_000,
+  });
+
+  const promptKey = useMemo(() => {
+    const ids = favoritesData?.promptIds ?? [];
+    return ids.length > 0 ? ['prompts', ids.sort().join(',')] : null;
+  }, [favoritesData?.promptIds]);
+
+  const {
+    data: promptsData,
+    isLoading: promptsLoading,
+    error: promptsError,
+  } = useSWR(promptKey, () => fetchPrompts(favoritesData?.promptIds ?? []), {
+    revalidateOnFocus: false,
+    dedupingInterval: 30_000,
+  });
+
+  if (checkingAuth || favoritesLoading || promptsLoading) {
+    return <PromptGridSkeleton />;
   }
 
-  const prompts = data?.prompts ?? [];
+  if (favoritesError || promptsError) {
+    console.error('Error loading favorite prompts:', favoritesError || promptsError);
+    return (
+      <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-8 text-center">
+        <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+          Unable to load your favorites right now. Please try again later.
+        </p>
+      </div>
+    );
+  }
+
+  const prompts = promptsData?.prompts ?? [];
 
   if (prompts.length === 0) {
     return (
@@ -60,24 +106,4 @@ export default function ProfileClient({ promptIds }: ProfileClientProps) {
   }
 
   return <PromptGrid prompts={prompts} />;
-}
-
-function PromptGridSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, idx) => (
-        <div
-          key={idx}
-          className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900/40"
-        >
-          <div className="animate-pulse bg-gray-800/60 aspect-[16/9]" />
-          <div className="p-4 space-y-3">
-            <div className="h-4 w-2/3 rounded bg-gray-800/60" />
-            <div className="h-4 w-full rounded bg-gray-800/40" />
-            <div className="h-4 w-5/6 rounded bg-gray-800/30" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 }

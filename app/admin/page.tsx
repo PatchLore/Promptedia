@@ -8,6 +8,9 @@ import { getSupabaseServerClient } from '@/lib/supabase/server';
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+const canonicalUrl = `${siteUrl}/admin`;
+
 export default async function AdminPage() {
   const supabase = getSupabaseServerClient();
   // Fetch all prompts
@@ -28,29 +31,61 @@ export default async function AdminPage() {
     console.error('Error fetching prompts:', error);
   }
 
-  const content = (
-    <AdminAuthCheck>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Manage all prompts in the database
-            </p>
-          </div>
-          <Link
-            href="/create"
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
-          >
-            + New Prompt
-          </Link>
-        </div>
+  const webPageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Admin Dashboard',
+    url: canonicalUrl,
+    description: 'Manage prompts, visibility, and metadata across the On Point Prompt catalog.',
+  };
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-          <AdminTable prompts={(prompts as PromptRow[]) || []} />
+  const content = (
+    <>
+      <head>
+        <title>Admin Dashboard | On Point Prompt</title>
+        <meta
+          name="description"
+          content="Moderate and manage prompts across the On Point Prompt catalog."
+        />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content="Admin Dashboard | On Point Prompt" />
+        <meta
+          property="og:description"
+          content="Moderate and manage prompts across the On Point Prompt catalog."
+        />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={`${siteUrl}/og.png`} />
+        <meta property="og:type" content="website" />
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+        />
+      </head>
+
+      <AdminAuthCheck>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Manage all prompts in the database
+              </p>
+            </div>
+            <Link
+              href="/create"
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
+            >
+              + New Prompt
+            </Link>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <AdminTable prompts={(prompts as PromptRow[]) || []} />
+          </div>
         </div>
-      </div>
-    </AdminAuthCheck>
+      </AdminAuthCheck>
+    </>
   );
 
   return <WrapperClient>{content}</WrapperClient>;

@@ -7,6 +7,15 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.c
 const canonicalUrl = `${siteUrl}/sign-in`;
 
 export default function SignInPage() {
+  const webPageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Sign In to On Point Prompt',
+    url: canonicalUrl,
+    description:
+      'Sign in to manage your saved AI prompts and personalized creator tools on On Point Prompt.',
+  };
+
   const content = (
     <>
       <head>
@@ -24,6 +33,11 @@ export default function SignInPage() {
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:image" content={`${siteUrl}/og.png`} />
         <meta property="og:type" content="website" />
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+        />
       </head>
 
       <div className="container mx-auto max-w-screen-lg px-4 py-8">

@@ -47,16 +47,7 @@ export default async function BrowsePage({
   const category = searchParams?.category ?? 'all';
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
   const baseUrl = siteUrl;
-
-  const queryParams = new URLSearchParams();
-  if (search) {
-    queryParams.set('search', search);
-  }
-  if (category !== 'all') {
-    queryParams.set('category', category);
-  }
-  const queryString = queryParams.toString();
-  const canonicalUrl = `${siteUrl}/browse${queryString ? `?${queryString}` : ''}`;
+  const canonicalUrl = `${siteUrl}/browse`;
 
   let query = supabase
     .from('prompts')
