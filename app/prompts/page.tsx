@@ -3,23 +3,8 @@ export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import WrapperClient from '@/app/WrapperClient';
-import type { Metadata } from 'next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
-
-export const metadata: Metadata = {
-  title: 'All Prompts | On Point Prompt',
-  description: 'Explore every AI prompt available on On Point Prompt, organised by category and keyword.',
-  alternates: {
-    canonical: `${siteUrl}/prompts`,
-  },
-  openGraph: {
-    title: 'All Prompts | On Point Prompt',
-    description: 'Explore every AI prompt available on On Point Prompt, organised by category and keyword.',
-    url: `${siteUrl}/prompts`,
-    images: [{ url: '/og.png', width: 1200, height: 630 }],
-  },
-};
 
 const collectionLdJson = {
   '@context': 'https://schema.org',

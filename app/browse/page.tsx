@@ -1,26 +1,7 @@
 import { supabase } from '@/lib/supabase/client';
 import BrowseClient from '@/components/BrowseClient';
-import PromptCardSkeleton from '@/components/PromptCardSkeleton';
-import { Suspense } from 'react';
-import type { Metadata } from 'next';
 import { buildPromptUrl } from '@/lib/slug';
 import WrapperClient from '@/app/WrapperClient';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
-
-export const metadata: Metadata = {
-  title: 'Browse Prompts | On Point Prompt',
-  description: 'Search and filter AI prompts by category, type, and keywords on On Point Prompt.',
-  alternates: {
-    canonical: `${siteUrl}/browse`,
-  },
-  openGraph: {
-    title: 'Browse Prompts | On Point Prompt',
-    description: 'Search and filter AI prompts by category, type, and keywords on On Point Prompt.',
-    url: `${siteUrl}/browse`,
-    images: [{ url: '/og.png', width: 1200, height: 630 }],
-  },
-};
 
 export const dynamic = 'force-dynamic';
 
@@ -128,21 +109,7 @@ export default async function BrowsePage({
         }}
       />
 
-      <Suspense
-        fallback={
-          <div className="space-y-6">
-            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
-            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <PromptCardSkeleton key={i} />
-              ))}
-            </div>
-          </div>
-        }
-      >
-        <BrowseClient categories={categories} prompts={prompts || []} />
-      </Suspense>
+      <BrowseClient categories={categories} prompts={prompts || []} />
     </div>
   );
 

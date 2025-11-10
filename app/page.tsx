@@ -4,25 +4,8 @@ import { supabase } from '@/lib/supabase/client';
 import PromptGrid from '@/components/PromptGrid';
 import Link from 'next/link';
 import WrapperClient from '@/app/WrapperClient';
-import type { Metadata } from 'next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
-
-export const metadata: Metadata = {
-  title: 'On Point Prompt — Discover AI Prompts & Inspiration',
-  description:
-    'Browse curated AI prompts for ChatGPT, Midjourney, and music generation. Discover inspiration daily with On Point Prompt.',
-  alternates: {
-    canonical: `${siteUrl}/`,
-  },
-  openGraph: {
-    title: 'On Point Prompt — Discover AI Prompts & Inspiration',
-    description:
-      'Browse curated AI prompts for ChatGPT, Midjourney, and music generation. Discover inspiration daily with On Point Prompt.',
-    url: `${siteUrl}/`,
-    images: [{ url: '/og.png', width: 1200, height: 630 }],
-  },
-};
 
 const categories = [
   { name: 'Art', slug: 'art', icon: '🎨' },
@@ -38,7 +21,6 @@ const websiteLdJson = {
   name: 'On Point Prompt',
   url: `${siteUrl}/`,
 };
-
 
 export default async function HomePage() {
   const { data: featuredPrompts } = await supabase

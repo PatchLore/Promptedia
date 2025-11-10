@@ -3,52 +3,9 @@ import { notFound } from 'next/navigation';
 import WrapperClient from '@/app/WrapperClient';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
-
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const canonical = `${siteUrl}/prompts/${params.slug}`;
-
-  const { data: prompt, error } = await supabase
-    .from('prompts')
-    .select('title, description, category, slug')
-    .eq('slug', params.slug)
-    .single<Pick<PromptRow, 'title' | 'description' | 'category' | 'slug'>>();
-
-  if (error || !prompt) {
-    return {
-      title: `${params.slug} | On Point Prompt`,
-      description: `AI prompt: ${params.slug}`,
-      alternates: {
-        canonical,
-      },
-      openGraph: {
-        title: `${params.slug} | On Point Prompt`,
-        description: `AI prompt: ${params.slug}`,
-        url: canonical,
-        images: [{ url: '/og.png', width: 1200, height: 630 }],
-      },
-    };
-  }
-
-  const title = prompt.title || `${params.slug} | On Point Prompt`;
-  const description = prompt.description || `AI prompt: ${prompt.title || params.slug}`;
-  const category = prompt.category || 'Prompt';
-  const ogImageUrl = `${siteUrl}/prompts/${prompt.slug}/opengraph-image?title=${encodeURIComponent(title)}&category=${encodeURIComponent(category)}`;
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical,
-    },
-    openGraph: {
-      title,
-      description,
-      url: canonical,
-      images: [{ url: ogImageUrl }],
-    },
-  };
-}
 
 export default async function PromptSlugPage({ params }: { params: { slug: string } }) {
   const { data: prompt, error } = await supabase

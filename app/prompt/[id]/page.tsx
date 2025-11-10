@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import WrapperClient from '@/app/WrapperClient';
 
+export const dynamic = 'force-dynamic';
+
 type PromptRecord = { id?: string; slug?: string | null; [key: string]: any };
 
 export default async function LegacyPromptRedirect({

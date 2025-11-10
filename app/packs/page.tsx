@@ -1,24 +1,7 @@
 import PacksClient from '@/components/PacksClient';
 import WrapperClient from '@/app/WrapperClient';
-import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
-
-export const metadata: Metadata = {
-  title: 'Prompt Packs | On Point Prompt',
-  description: 'Browse premium AI prompt packs curated by On Point Prompt for creators and professionals.',
-  alternates: {
-    canonical: `${siteUrl}/packs`,
-  },
-  openGraph: {
-    title: 'Prompt Packs | On Point Prompt',
-    description: 'Browse premium AI prompt packs curated by On Point Prompt for creators and professionals.',
-    url: `${siteUrl}/packs`,
-    images: [{ url: '/og.png', width: 1200, height: 630 }],
-  },
-};
 
 export default function PacksPage() {
   return (
@@ -30,7 +13,7 @@ export default function PacksPage() {
           100+ ready-to-use prompts to help creators move faster and produce consistent results across every workflow.
         </p>
         <p>
-          Unlock professionally crafted prompts that save time, eliminate guesswork, and empower your next project—whether you&apos;re designing visuals,
+          Unlock professionally crafted prompts that save time, eliminate guesswork, and empower your next project—whether you're designing visuals,
           producing audio, or writing copy.
         </p>
         <ul className="list-disc list-inside space-y-1 text-sm">
