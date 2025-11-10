@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase/client';
 import { Affiliate, getDefaultAffiliate } from './affiliate';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
  * Server-side version of pickAffiliateForCategory for use in Server Components.
@@ -7,6 +7,8 @@ import { Affiliate, getDefaultAffiliate } from './affiliate';
 export async function pickAffiliateForCategoryServer(
   category?: string
 ): Promise<Affiliate | null> {
+  const supabase = getSupabaseServerClient();
+
   if (!category) {
     return getDefaultAffiliate();
   }
@@ -18,7 +20,9 @@ export async function pickAffiliateForCategoryServer(
     // Fetch all active affiliates
     const { data: affiliates, error } = await supabase
       .from('affiliates')
-      .select('*')
+      .select(
+        'id, name, category, affiliate_url, commission_value, commission_type, cookie_days, is_active, created_at'
+      )
       .eq('is_active', true)
       .order('commission_value', { ascending: false });
 

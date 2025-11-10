@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next';
-import { supabase } from '@/lib/supabase/client';
 import { buildPromptUrl } from '@/lib/slug';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+  const supabase = getSupabaseServerClient();
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -27,29 +28,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const categories = ['art', 'music', 'writing', 'business', 'coding'];
-  const categoryRoutes: MetadataRoute.Sitemap = categories.map((c) => ({
-    url: `${baseUrl}/browse?category=${encodeURIComponent(c)}`,
+  const categoryRoutes: MetadataRoute.Sitemap = categories.map((slug) => ({
+    url: `${baseUrl}/browse?category=${encodeURIComponent(slug)}`,
     changeFrequency: 'weekly',
     priority: 0.6,
     lastModified: new Date(),
   }));
 
-  const { data: prompts } = await supabase
+  const { data: prompts, error } = await supabase
     .from('prompts')
-        .select('id, slug, created_at')
+    .select('id, slug, created_at, updated_at')
     .eq('is_public', true)
     .eq('is_pro', false)
     .order('created_at', { ascending: false })
     .limit(5000);
 
-      const promptRoutes: MetadataRoute.Sitemap = (prompts || []).map((p: any) => ({
-        url: buildPromptUrl(baseUrl, p),
-    changeFrequency: 'weekly',
-    priority: 0.7,
-    lastModified: new Date(p.updated_at || p.created_at || Date.now()),
-  }));
+  if (error && process.env.NODE_ENV === 'development') {
+    console.error('Failed to load prompts for sitemap', error);
+  }
+
+  const promptRoutes: MetadataRoute.Sitemap =
+    prompts?.map((prompt) => ({
+      url: buildPromptUrl(baseUrl, prompt),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+      lastModified: new Date(prompt.updated_at ?? prompt.created_at ?? Date.now()),
+    })) ?? [];
 
   return [...staticRoutes, ...categoryRoutes, ...promptRoutes];
 }
-
-

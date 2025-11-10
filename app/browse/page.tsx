@@ -1,7 +1,7 @@
-import { supabase } from '@/lib/supabase/client';
 import BrowseClient from '@/components/BrowseClient';
 import { buildPromptUrl } from '@/lib/slug';
 import WrapperClient from '@/app/WrapperClient';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +42,7 @@ export default async function BrowsePage({
 }: {
   searchParams?: { search?: string; category?: string };
 }) {
+  const supabase = getSupabaseServerClient();
   const search = searchParams?.search ?? '';
   const category = searchParams?.category ?? 'all';
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
@@ -59,7 +60,9 @@ export default async function BrowsePage({
 
   let query = supabase
     .from('prompts')
-    .select('*')
+    .select(
+      'id, title, slug, prompt, description, category, tags, created_at, example_url, thumbnail_url, type'
+    )
     .eq('is_public', true)
     .eq('is_pro', false);
 

@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
 import WrapperClient from '@/app/WrapperClient';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
 
@@ -11,6 +11,7 @@ export default async function PromptsPage({
 }: {
   searchParams?: { q?: string; category?: string };
 }) {
+  const supabase = getSupabaseServerClient();
   const category = searchParams?.category || '';
   const search = searchParams?.q || '';
   const queryParams = new URLSearchParams();
@@ -25,7 +26,8 @@ export default async function PromptsPage({
 
   let query = supabase
     .from('prompts')
-    .select('slug, title, description, category')
+    .select('id, slug, title, description, category, created_at')
+    .eq('is_public', true)
     .order('created_at', { ascending: false });
 
   if (search) {

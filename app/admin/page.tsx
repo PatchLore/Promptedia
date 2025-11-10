@@ -1,17 +1,21 @@
-import { supabase, PromptRow } from '@/lib/supabase/client';
+import type { PromptRow } from '@/lib/supabase/client';
 import AdminTable from '@/components/AdminTable';
 import Link from 'next/link';
 import AdminAuthCheck from '@/components/AdminAuthCheck';
 import WrapperClient from '@/app/WrapperClient';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
+  const supabase = getSupabaseServerClient();
   // Fetch all prompts
   const { data: prompts, error } = await supabase
     .from('prompts')
-    .select('*')
+    .select(
+      'id, title, slug, prompt, description, category, tags, type, example_url, audio_preview_url, thumbnail_url, model, is_public, is_pro, created_at, updated_at'
+    )
     .order('created_at', { ascending: false });
 
   if (error) {

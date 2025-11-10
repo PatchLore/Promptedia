@@ -31,7 +31,9 @@ export async function pickAffiliateForCategory(
     // Using contains to match any category in the array
     const { data: affiliates, error } = await supabase
       .from('affiliates')
-      .select('*')
+      .select(
+        'id, name, category, affiliate_url, commission_value, commission_type, cookie_days, is_active, created_at'
+      )
       .eq('is_active', true)
       .order('commission_value', { ascending: false });
 

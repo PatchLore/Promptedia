@@ -18,7 +18,7 @@ async function generateUniqueSlug(
   while (attempt < 5) {
     const result = await supabase
       .from('prompts')
-      .select('*')
+      .select('id, slug')
       .eq('slug', candidate)
       .maybeSingle<PromptRow>();
 
@@ -103,7 +103,9 @@ export async function createPrompt(data: {
   const { data: inserted, error: insertError } = await supabase
     .from('prompts')
     .insert(insertData)
-    .select()
+    .select(
+      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, model, type, is_public, is_pro'
+    )
     .single<PromptRow>();
 
   if (insertError || !inserted) {
@@ -148,7 +150,7 @@ export async function toggleFavorite(promptId: string) {
 
     const { data: promptMeta } = await supabase
       .from('prompts')
-      .select('*')
+      .select('id, slug')
       .eq('id', promptId)
       .maybeSingle<PromptRow>();
 
@@ -170,7 +172,7 @@ export async function toggleFavorite(promptId: string) {
 
     const { data: promptMeta } = await supabase
       .from('prompts')
-      .select('*')
+      .select('id, slug')
       .eq('id', promptId)
       .maybeSingle<PromptRow>();
 
@@ -183,7 +185,7 @@ export async function toggleFavorite(promptId: string) {
 export async function updatePrompt(id: string, fields: PromptUpdate): Promise<PromptRow> {
   const { data: existingPrompt } = await supabase
     .from('prompts')
-    .select('*')
+    .select('id, slug')
     .eq('id', id)
     .maybeSingle<PromptRow>();
 
@@ -209,7 +211,9 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
     .from('prompts')
     .update(updatePayload)
     .eq('id', id)
-    .select()
+    .select(
+      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, model, type, is_public, is_pro'
+    )
     .single<PromptRow>();
 
   if (updateError || !updated) {

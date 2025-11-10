@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
 import WrapperClient from '@/app/WrapperClient';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +13,7 @@ export default async function LegacyPromptRedirect({
 }: {
   params: { id: string };
 }) {
+  const supabase = getSupabaseServerClient();
   const canonicalUrl = `${siteUrl}/prompt/${params.id}`;
 
   const { data, error } = await supabase

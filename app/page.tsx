@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic';
 
-import { supabase } from '@/lib/supabase/client';
 import PromptGrid from '@/components/PromptGrid';
 import Link from 'next/link';
 import WrapperClient from '@/app/WrapperClient';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
 const canonicalUrl = `${siteUrl}/`;
@@ -17,13 +17,21 @@ const categories = [
 ];
 
 export default async function HomePage() {
-  const { data: featuredPrompts } = await supabase
+  const supabase = getSupabaseServerClient();
+
+  const { data: featuredPrompts, error: featuredError } = await supabase
     .from('prompts')
-    .select('*')
+    .select(
+      'id, title, slug, prompt, category, tags, example_url, thumbnail_url, type, created_at'
+    )
     .eq('is_public', true)
     .eq('is_pro', false)
     .order('created_at', { ascending: false })
     .limit(12);
+
+  if (featuredError && process.env.NODE_ENV === 'development') {
+    console.error('Failed to load featured prompts', featuredError);
+  }
 
   const websiteLdJson = {
     '@context': 'https://schema.org',

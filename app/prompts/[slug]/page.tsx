@@ -1,16 +1,21 @@
-import { supabase, PromptRow } from '@/lib/supabase/client';
+import type { PromptRow } from '@/lib/supabase/client';
 import { notFound } from 'next/navigation';
 import WrapperClient from '@/app/WrapperClient';
 import Link from 'next/link';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
 
 export default async function PromptSlugPage({ params }: { params: { slug: string } }) {
+  const supabase = getSupabaseServerClient();
+
   const { data: prompt, error } = await supabase
     .from('prompts')
-    .select('*')
+    .select(
+      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, model, type'
+    )
     .eq('slug', params.slug)
     .single<PromptRow>();
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -54,17 +54,25 @@ export async function GET(request: NextRequest) {
       const ids = results.map((p) => p.id);
       const likeClauses = ids.map((id) => `example_url.ilike.%${id}%`).join(',');
       let usedIds = new Set<string>();
-      if (ids.length > 0) {
-        const { data: usedPrompts } = await supabase
-          .from('prompts')
-          .select('example_url')
-          .or(likeClauses);
-        (usedPrompts || []).forEach((row: any) => {
-          const url: string = row.example_url || '';
-          ids.forEach((id) => {
-            if (url.includes(id)) usedIds.add(id);
-          });
-        });
+      if (ids.length > 0 && likeClauses.length > 0) {
+        try {
+          const supabase = getSupabaseServerClient();
+          const { data: usedPrompts, error: usedError } = await supabase
+            .from('prompts')
+            .select('example_url')
+            .or(likeClauses);
+
+          if (!usedError && usedPrompts) {
+            usedPrompts.forEach((row: any) => {
+              const url: string = row.example_url || '';
+              ids.forEach((id) => {
+                if (url.includes(id)) usedIds.add(id);
+              });
+            });
+          }
+        } catch (error) {
+          console.error('Supabase check failed while deduplicating Unsplash results:', error);
+        }
       }
 
       // Pick the first unused photo

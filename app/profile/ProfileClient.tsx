@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import useSWR from 'swr';
 import PromptGrid from '@/components/PromptGrid';
-import { supabase } from '@/lib/supabase/client';
 import type { PromptRow } from '@/lib/supabase/client';
 
 interface ProfileClientProps {
@@ -10,55 +10,38 @@ interface ProfileClientProps {
 }
 
 export default function ProfileClient({ promptIds }: ProfileClientProps) {
-  const [prompts, setPrompts] = useState<PromptRow[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadPrompts() {
-      if (promptIds.length === 0) {
-        if (active) {
-          setPrompts([]);
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('prompts')
-        .select('*')
-        .in('id', promptIds)
-        .order('created_at', { ascending: false });
-
-      if (!active) return;
-
-      if (error) {
-        console.error('Error loading prompts:', error);
-        setPrompts([]);
-      } else {
-        setPrompts(data || []);
-      }
-
-      setIsLoading(false);
+  const fetchKey = useMemo(() => {
+    if (promptIds.length === 0) {
+      return null;
     }
-
-    loadPrompts();
-
-    return () => {
-      active = false;
-    };
+    const query = encodeURIComponent(promptIds.join(','));
+    return `/api/prompts?ids=${query}&includePrivate=true`;
   }, [promptIds]);
 
+  const fetcher = (url: string) =>
+    fetch(url).then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to load favorites: ${response.statusText}`);
+      }
+      return response.json() as Promise<{ prompts: PromptRow[] }>;
+    });
+
+  const { data, isLoading, error } = useSWR(fetchKey, fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 30_000,
+    fallbackData: { prompts: [] },
+    keepPreviousData: true,
+  });
+
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }).map((_, idx) => (
-          <div key={idx} className="animate-pulse rounded-xl bg-gray-800/50 h-48" />
-        ))}
-      </div>
-    );
+    return <PromptGrid prompts={[]} isLoading skeletonCount={6} />;
   }
+
+  if (error) {
+    console.error('Error loading favorite prompts:', error);
+  }
+
+  const prompts = data?.prompts ?? [];
 
   if (prompts.length === 0) {
     return (
