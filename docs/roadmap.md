@@ -108,6 +108,80 @@ Each category serves as a starting point for creativity:
 
 ---
 
+## 🎼 Genre Explorer Module (Music Discovery + AI Integration)
+
+**Status:** Planned  
+**Priority:** Medium–High  
+**Type:** Traffic Engine + AI Integration + SEO Growth
+
+### Overview
+
+The Genre Explorer is a large-scale, SEO-driven content engine powered by free public music data. It aggregates genres, subgenres, and top tracks using openly accessible datasets (MusicBrainz, Wikipedia, Discogs) and connects them directly to On Point Prompt’s AI music generation tools. This creates a two-way funnel where free organic traffic built on lists and rankings converts into AI-generated sound prompts.
+
+### Core Features
+
+- ✅ Genre index page covering 500–1000+ music genres
+- ✅ Dynamic top-100 track listings per genre
+- ✅ Subgenre breakdown with descriptions
+- ✅ Links to YouTube and Spotify for previews
+- ✅ Integrated AI music prompt suggestions
+- ✅ Calls-to-action to generate music in the genre
+- ✅ Structured metadata for SEO
+- ✅ Cached/static pages for high performance
+- ✅ Related genres to strengthen internal linking
+
+### Data Sources (Free & Safe)
+
+- MusicBrainz API (Free, no key required)
+- Wikipedia genre and discography pages
+- Discogs public endpoints (basic usage)
+- Last.fm (scrapable lists, optional)
+
+All data is community-maintained and usable under open licenses.
+
+### User Flow
+
+1. User lands on `/genres`.
+2. User selects a genre (e.g., Trance).
+3. Genre page loads with description, subgenres, top 100 tracks, and major artists.
+4. Each section features a "Generate AI music in this style" CTA.
+5. Clicking the CTA routes the user to the On Point Prompt music generator to create, save, or download AI previews.
+
+### SEO & Growth Strategy
+
+- High-value SEO content for every genre page.
+- Optimised titles such as "Top 100 Trance Tracks of All Time."
+- Long-tail keyword coverage with strong internal linking.
+- Embedded structured schema: `MusicPlaylist`, `MusicGroup`, `CreativeWork`.
+- Ideal for ad inventory and affiliate monetisation.
+
+### Monetisation Opportunities
+
+- Ads on high-traffic genre lists.
+- Music gear affiliate links (Amazon, Thomann, etc.).
+- "Pro Producer Prompt Packs" upsell.
+- AI music credit consumption inside Soundswoop.
+- Newsletter signups (e.g., "Best Tracks of Each Genre").
+- Artist-focused prompt packs that avoid copyrighted assets.
+
+### Planned Technical Implementation
+
+- Next.js static generation with ISR for scalable publishing.
+- Supabase tables for caching genre, subgenre, and track data.
+- Hierarchical data model (Genre → Subgenre → Track).
+- Lightweight scraping and normalisation scripts.
+- Automatic prompt generation via AI from genre metadata.
+- External preview links only (YouTube, Spotify) to avoid hosting copyrighted audio.
+
+### Why It Fits the Vision
+
+- Expands On Point Prompt’s content depth and authority.
+- Leverages free data sources with no API overhead.
+- Captures evergreen organic traffic that feeds Soundswoop usage.
+- Converts visitors into AI creators through contextual prompts.
+- Strengthens long-term positioning in the AI music niche.
+
+---
 ## 💰 Monetization Path (v2.0)
 
 | Tier | Features |

@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import AuthButton from './AuthButton';
 import SearchBar from './SearchBar';
@@ -9,6 +10,7 @@ import SearchBar from './SearchBar';
 type User = NonNullable<Awaited<ReturnType<typeof supabase.auth.getUser>>['data']['user']>;
 
 export default function Navbar() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -32,6 +34,18 @@ export default function Navbar() {
     };
   }, []);
 
+  const handleSearch = useCallback(
+    (query: string) => {
+      if (!query) {
+        router.push('/browse');
+        return;
+      }
+      const params = new URLSearchParams({ search: query });
+      router.push(`/browse?${params.toString()}`);
+    },
+    [router],
+  );
+
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -41,7 +55,7 @@ export default function Navbar() {
           </Link>
 
           <div className="flex-1 max-w-md mx-8">
-            <SearchBar />
+            <SearchBar onChange={handleSearch} placeholder="Search the library..." />
           </div>
 
           <div className="flex items-center gap-4">

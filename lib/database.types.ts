@@ -79,6 +79,98 @@ export type Database = {
           },
         ]
       }
+      prompt_collection_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          collection_id: string | null
+          prompt_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          collection_id?: string | null
+          prompt_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          collection_id?: string | null
+          prompt_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_collection_items_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompt_collections: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      saved_prompts: {
+        Row: {
+          created_at: string | null
+          id: string
+          prompt_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          prompt_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          prompt_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_prompts_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prompts: {
         Row: {
           audio_preview_url: string | null

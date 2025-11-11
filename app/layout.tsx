@@ -8,6 +8,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.className}>
       <head>
         <link rel="preload" href="/globals.css" as="style" />
+        <link rel="canonical" href="https://www.onpointprompt.com" />
         <meta httpEquiv="Cache-Control" content="public, max-age=604800, immutable" />
       </head>
       <body>{children}</body>

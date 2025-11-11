@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "fix:tags": "node ./scripts/fix_tags.js",
+    "fix:slugs": "node ./scripts/fix_slugs.js",
+    "fix:metadata": "node ./scripts/fix_missing_metadata.js"
   },
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.7",
@@ -14,7 +17,6 @@
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.79.0",
     "@tailwindcss/postcss": "^4.1.16",
-    "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@vercel/analytics": "^1.5.0",
@@ -24,6 +26,7 @@
     "csv-stringify": "^6.6.0",
     "ffmpeg-static": "^5.2.0",
     "fluent-ffmpeg": "^2.1.3",
+    "fuse.js": "^7.1.0",
     "next": "^16.0.1",
     "openai": "^6.8.0",
     "postcss": "^8.5.6",
@@ -31,10 +34,12 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "swr": "^2.3.6",
-    "tailwindcss": "^4.1.16",
-    "typescript": "^5.9.3"
+    "tailwindcss": "^4.1.16"
   },
   "devDependencies": {
-    "dotenv": "^17.2.3"
+    "@types/node": "^24.10.0",
+    "dotenv": "^17.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

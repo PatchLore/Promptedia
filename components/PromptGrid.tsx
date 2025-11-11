@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import PromptCard from './PromptCard';
 
 // Bundle note: PromptGrid renders many cards; memoization + lazy loading help prevent unnecessary client bundle growth.
@@ -7,9 +7,33 @@ type PromptGridProps = {
   prompts: any[];
   isLoading?: boolean;
   skeletonCount?: number;
+  savedPromptIds?: string[] | Set<string>;
+  onToggleSave?: (promptId: string, shouldSave: boolean) => void;
+  onOpenCollections?: (promptId: string) => void;
+  onRemoveFromCollection?: (promptId: string) => void;
+  showRemoveFromCollection?: boolean;
+  isAuthenticated?: boolean;
 };
 
-function PromptGrid({ prompts, isLoading = false, skeletonCount = 6 }: PromptGridProps) {
+function PromptGrid({
+  prompts,
+  isLoading = false,
+  skeletonCount = 6,
+  savedPromptIds,
+  onToggleSave,
+  onOpenCollections,
+  onRemoveFromCollection,
+  showRemoveFromCollection = false,
+  isAuthenticated = false,
+}: PromptGridProps) {
+  const savedSet = useMemo(() => {
+    if (!savedPromptIds) return new Set<string>();
+    if (savedPromptIds instanceof Set) {
+      return savedPromptIds;
+    }
+    return new Set(savedPromptIds);
+  }, [savedPromptIds]);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -43,7 +67,16 @@ function PromptGrid({ prompts, isLoading = false, skeletonCount = 6 }: PromptGri
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {prompts.map((prompt) => (
-        <PromptCard key={prompt.id || prompt.slug} prompt={prompt} />
+        <PromptCard
+          key={prompt.id || prompt.slug}
+          prompt={prompt}
+          saved={savedSet.has(prompt.id)}
+          onToggleSave={onToggleSave}
+          onOpenCollections={onOpenCollections}
+          onRemoveFromCollection={onRemoveFromCollection}
+          showRemoveFromCollection={showRemoveFromCollection}
+          isAuthenticated={isAuthenticated}
+        />
       ))}
     </div>
   );

@@ -9,6 +9,55 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      favorites: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          prompt_id: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          prompt_id?: string | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database['public']['Tables']['favorites']['Insert']>;
+      };
+      prompt_collection_items: {
+        Row: {
+          id: string;
+          collection_id: string | null;
+          prompt_id: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          collection_id?: string | null;
+          prompt_id?: string | null;
+          created_at?: string | null;
+        };
+        Update: Partial<Database['public']['Tables']['prompt_collection_items']['Insert']>;
+      };
+      prompt_collections: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          name: string | null;
+          description: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          name?: string | null;
+          description?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: Partial<Database['public']['Tables']['prompt_collections']['Insert']>;
+      };
       prompts: {
         Row: {
           id: string;
@@ -59,20 +108,20 @@ export interface Database {
           updated_at?: string | null;
         };
       };
-      favorites: {
+      saved_prompts: {
         Row: {
           id: string;
-          user_id: string;
-          prompt_id: string;
-          created_at: string;
+          user_id: string | null;
+          prompt_id: string | null;
+          created_at: string | null;
         };
         Insert: {
           id?: string;
-          user_id: string;
-          prompt_id: string;
-          created_at?: string;
+          user_id?: string | null;
+          prompt_id?: string | null;
+          created_at?: string | null;
         };
-        Update: Partial<Database['public']['Tables']['favorites']['Insert']>;
+        Update: Partial<Database['public']['Tables']['saved_prompts']['Insert']>;
       };
     };
   };

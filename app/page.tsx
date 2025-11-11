@@ -1,9 +1,33 @@
-export const dynamic = 'force-dynamic';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import WrapperClient from '@/app/WrapperClient';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import LazyPromptGrid from '@/components/LazyPromptGrid';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'OnPointPrompt — AI Prompts Library',
+  description: 'Browse, discover and save AI prompts for art, music, writing and more.',
+  openGraph: {
+    title: 'OnPointPrompt — AI Prompts Library',
+    description: 'Browse, discover and save AI prompts for art, music, writing and more.',
+    url: 'https://www.onpointprompt.com',
+    siteName: 'OnPointPrompt',
+    images: [
+      {
+        url: '/images/default-og.png',
+        width: 1200,
+        height: 630,
+        alt: 'OnPointPrompt — AI Prompts Library',
+      },
+    ],
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://www.onpointprompt.com',
+  },
+};
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
 const canonicalUrl = `${siteUrl}/`;
@@ -72,26 +96,6 @@ export default async function HomePage() {
 
   const content = (
     <>
-      <head>
-        <title>On Point Prompt — Discover AI Prompts &amp; Inspiration</title>
-        <meta
-          name="description"
-          content="Browse curated AI prompts for ChatGPT, Midjourney, music generation, and more. Discover inspiration daily with On Point Prompt."
-        />
-        <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:title" content="On Point Prompt — Discover AI Prompts & Inspiration" />
-        <meta
-          property="og:description"
-          content="Explore curated prompts for ChatGPT, Midjourney, Suno, and other AI tools. Save your favorites and level up your creativity."
-        />
-        <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:image" content={`${siteUrl}/og.png`} />
-        <meta property="og:type" content="website" />
-        {preloadImages.map((href) => (
-          <link key={href} rel="preload" as="image" href={href} />
-        ))}
-      </head>
-
       <div className="container mx-auto max-w-screen-lg px-4 py-8">
         <script
           type="application/ld+json"
@@ -164,7 +168,11 @@ export default async function HomePage() {
     </>
   );
 
-  return <WrapperClient>{content}</WrapperClient>;
+  return (
+    <WrapperClient>
+      {content}
+    </WrapperClient>
+  );
 }
 
 

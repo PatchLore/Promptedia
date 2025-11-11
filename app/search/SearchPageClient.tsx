@@ -2,19 +2,23 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useSearchParams, useRouter } from 'next/navigation';
-import SearchBar from './SearchBar';
-import TagFilter from './TagFilter';
-import SortDropdown from './SortDropdown';
-import TagChips from './TagChips';
-import { PromptGridSkeleton } from './LazyPromptGrid';
-import { rankPrompts, sortByTrending } from '@/lib/semanticSearch';
+import useSWR from 'swr';
+import { rankPrompts, PromptDocument, sortByTrending } from '@/lib/semanticSearch';
+import LazyGlobalSearch from '@/components/LazyGlobalSearch';
+import { PromptGridSkeleton } from '@/components/LazyPromptGrid';
 import { supabase } from '@/lib/supabase/client';
 
-export type BrowseClientProps = {
-  prompts: any[];
-  categories: { name: string; slug: string }[];
-  isInitialLoad?: boolean;
+const PromptGrid = dynamic(() => import('@/components/PromptGrid'), {
+  ssr: false,
+  loading: () => <PromptGridSkeleton />,
+});
+
+type SearchPageClientProps = {
+  initialQuery?: string;
+};
+
+type ApiResponse = {
+  prompts: PromptDocument[];
 };
 
 type PromptCollection = {
@@ -24,28 +28,28 @@ type PromptCollection = {
   created_at: string | null;
 };
 
-// Bundle note: this module handles filtering/search state; loading PromptGrid dynamically keeps initial hydration smaller.
-const PromptGrid = dynamic(() => import('./PromptGrid'), {
-  ssr: false,
-  loading: () => <PromptGridSkeleton />,
-});
+const fetcher = async (url: string): Promise<ApiResponse> => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error('Failed to fetch search results');
+  }
+  return res.json();
+};
 
-export default function BrowseClient({ prompts, categories, isInitialLoad = false }: BrowseClientProps) {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const searchParamsString = searchParams.toString();
-  const currentSearchParam = searchParams.get('search') || '';
-  const category = searchParams.get('category') || 'all';
-  const tagsParam = searchParams.get('tags') || '';
-  const sort = (searchParams.get('sort') || 'newest') as 'newest' | 'popular';
-  const activeTags = tagsParam
-    .split(',')
-    .map((t) => t.trim())
-    .filter(Boolean);
+function useDebouncedValue<T>(value: T, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
 
-  const [isMounted, setIsMounted] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(() => currentSearchParam);
-  const [isSearchPending, setIsSearchPending] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebounced(value), delay);
+    return () => window.clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}
+
+export default function SearchPageClient({ initialQuery = '' }: SearchPageClientProps) {
+  const [query, setQuery] = useState(initialQuery);
+  const debouncedQuery = useDebouncedValue(query, 300);
   const [userId, setUserId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [savedPromptIds, setSavedPromptIds] = useState<Set<string>>(() => new Set());
@@ -101,7 +105,7 @@ export default function BrowseClient({ prompts, categories, isInitialLoad = fals
       return;
     }
 
-    const fetchSavedPrompts = async () => {
+    const fetchSaved = async () => {
       const { data, error } = await supabase
         .from('saved_prompts')
         .select('prompt_id')
@@ -110,7 +114,7 @@ export default function BrowseClient({ prompts, categories, isInitialLoad = fals
       if (cancelled) return;
 
       if (error) {
-        console.error('Failed to load saved prompts', error);
+        console.error('Failed to load saved prompts for search view', error);
         setSavedPromptIds(new Set());
         return;
       }
@@ -121,7 +125,7 @@ export default function BrowseClient({ prompts, categories, isInitialLoad = fals
       setSavedPromptIds(new Set(ids));
     };
 
-    fetchSavedPrompts();
+    fetchSaved();
 
     return () => {
       cancelled = true;
@@ -162,77 +166,6 @@ export default function BrowseClient({ prompts, categories, isInitialLoad = fals
     };
   }, [userId]);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    setSearchQuery(currentSearchParam);
-  }, [currentSearchParam]);
-
-  const baseFiltered = useMemo(() => {
-    let list = prompts.slice();
-
-    if (category !== 'all') {
-      const catNorm = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
-      list = list.filter((p) => (p.category || '') === catNorm);
-    }
-
-    if (activeTags.length > 0) {
-      list = list.filter((p) => {
-        const pTags: string[] = Array.isArray(p.tags) ? p.tags : [];
-        const pSet = new Set(pTags.map((t) => t.toLowerCase()));
-        return activeTags.every((t) => pSet.has(t.toLowerCase()));
-      });
-    }
-
-    if (sort === 'newest') {
-      list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    } else if (sort === 'popular') {
-      const hasCounts = list.some((p) => typeof (p as any).favorite_count === 'number');
-      if (hasCounts) {
-        list.sort((a: any, b: any) => (b.favorite_count || 0) - (a.favorite_count || 0));
-      } else {
-        list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      }
-    }
-
-    return list;
-  }, [prompts, category, activeTags, sort]);
-
-  const filteredResults = useMemo(() => {
-    const trimmed = searchQuery.trim();
-    if (!trimmed) {
-      return baseFiltered;
-    }
-    if (trimmed.length < 2) {
-      return sortByTrending(baseFiltered);
-    }
-    const ranked = rankPrompts(baseFiltered, trimmed, {
-      limit: baseFiltered.length,
-      threshold: 0.45,
-    });
-    return ranked.length > 0 ? ranked : sortByTrending(baseFiltered);
-  }, [baseFiltered, searchQuery]);
-
-  const handleSearchChange = useCallback(
-    (value: string) => {
-      setSearchQuery(value);
-      const params = new URLSearchParams(searchParamsString);
-      if (value) {
-        params.set('search', value);
-      } else {
-        params.delete('search');
-      }
-      router.push(`/browse${params.toString() ? `?${params.toString()}` : ''}`);
-    },
-    [router, searchParamsString],
-  );
-
-  const handlePendingChange = useCallback((pending: boolean) => {
-    setIsSearchPending(pending);
-  }, []);
-
   const handleToggleSave = useCallback(
     async (promptId: string, shouldSave: boolean) => {
       if (!promptId || !userId || !accessToken) {
@@ -266,6 +199,7 @@ export default function BrowseClient({ prompts, categories, isInitialLoad = fals
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
         }
+
       } catch (error) {
         console.warn('Failed to toggle saved prompt', error);
         setSavedPromptIds(previous);
@@ -375,59 +309,94 @@ export default function BrowseClient({ prompts, categories, isInitialLoad = fals
     [activePromptId, collectionMembership, isAuthenticatedUser],
   );
 
-  const clearAll = () => {
-    const params = new URLSearchParams(searchParamsString);
-    ['search', 'category', 'tags', 'sort'].forEach((k) => params.delete(k));
-    setSearchQuery('');
-    router.push(`/browse${params.toString() ? `?${params.toString()}` : ''}`);
-  };
+  const apiKey = useMemo(() => {
+    const trimmed = debouncedQuery.trim();
+    if (trimmed.length < 2) return null;
+    const params = new URLSearchParams({ limit: '200', q: trimmed });
+    return `/api/prompts?${params.toString()}`;
+  }, [debouncedQuery]);
 
-  const showResults = isMounted && (!isInitialLoad || filteredResults.length > 0 || searchQuery.length > 0);
-  const skeletonCount = filteredResults.length > 0 ? Math.min(filteredResults.length, 9) : 6;
+  const { data, isLoading, error } = useSWR(apiKey, fetcher, {
+    revalidateOnFocus: false,
+    keepPreviousData: true,
+  });
+
+  const ranked = useMemo(() => {
+    if (!data) return [];
+    if (debouncedQuery.trim().length < 2) {
+      return sortByTrending(data.prompts ?? []);
+    }
+    return rankPrompts(data.prompts ?? [], debouncedQuery, { limit: 60, threshold: 0.5 });
+  }, [data, debouncedQuery]);
+
+  const showGrid = debouncedQuery.trim().length >= 2;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="flex-1">
-          <SearchBar
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onPendingChange={handlePendingChange}
-            placeholder="Search prompts by keyword, tag, or category..."
-          />
+    <div className="space-y-12">
+      <section className="space-y-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Search the Prompt Library</h1>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
+            Discover prompts across art, music, writing, coding, and business. Results update with semantic-style
+            ranking as you type.
+          </p>
         </div>
-        <div className="w-full md:w-56">
-          <SortDropdown />
+        <LazyGlobalSearch initialQuery={initialQuery} />
+      </section>
+
+      <section className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <label htmlFor="search-term" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Refine results
+            </label>
+            <input
+              id="search-term"
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Type at least two characters..."
+              className="mt-1 w-full sm:w-80 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:border-blue-500 transition"
+            />
+          </div>
+          {showGrid && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {isLoading ? 'Ranking results…' : `${ranked.length} matches`}
+            </p>
+          )}
         </div>
-      </div>
 
-      <TagFilter categories={categories} currentCategory={category} />
+        {!showGrid && (
+          <div className="rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-8 text-center text-gray-500 dark:text-gray-400">
+            Start typing above to explore semantic search results.
+          </div>
+        )}
 
-      <TagChips />
-
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-gray-400 dark:text-gray-300">{filteredResults.length} results</p>
-        <button
-          onClick={clearAll}
-          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm w-full sm:w-auto"
-        >
-          Clear filters
-        </button>
-      </div>
-
-      {showResults ? (
-        <PromptGrid
-          prompts={filteredResults}
-          isLoading={isSearchPending && searchQuery.length > 0}
-          skeletonCount={skeletonCount}
-          savedPromptIds={Array.from(savedPromptIds)}
-          onToggleSave={handleToggleSave}
-          onOpenCollections={openCollectionsModal}
-          isAuthenticated={isAuthenticatedUser}
-        />
-      ) : (
-        <PromptGridSkeleton />
-      )}
+        {showGrid && (
+          <>
+            {error && (
+              <div className="rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-600 dark:text-red-300">
+                Unable to load search results right now. Please try again shortly.
+              </div>
+            )}
+            {isLoading && <PromptGridSkeleton />}
+            {!isLoading && ranked.length === 0 && !error && (
+              <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40 p-8 text-center text-gray-500 dark:text-gray-400">
+                No prompts found. Adjust your keywords or try a different phrase.
+              </div>
+            )}
+            {!isLoading && ranked.length > 0 && (
+              <PromptGrid
+                prompts={ranked}
+                savedPromptIds={Array.from(savedPromptIds)}
+                onToggleSave={handleToggleSave}
+                onOpenCollections={openCollectionsModal}
+                isAuthenticated={isAuthenticatedUser}
+              />
+            )}
+          </>
+        )}
+      </section>
 
       {isCollectionsModalOpen && (
         <div
@@ -502,3 +471,5 @@ export default function BrowseClient({ prompts, categories, isInitialLoad = fals
     </div>
   );
 }
+
+
