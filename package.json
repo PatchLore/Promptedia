@@ -9,7 +9,8 @@
     "lint": "next lint",
     "fix:tags": "node ./scripts/fix_tags.js",
     "fix:slugs": "node ./scripts/fix_slugs.js",
-    "fix:metadata": "node ./scripts/fix_missing_metadata.js"
+    "fix:metadata": "node ./scripts/fix_missing_metadata.js",
+    "fix:media": "node ./scripts/fix_prompt_media_urls.js"
   },
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.7",

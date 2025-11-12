@@ -46,7 +46,7 @@ export default async function HomePage() {
   const { data: featuredPrompts, error: featuredError } = await supabase
     .from('prompts')
     .select(
-      'id, title, slug, prompt, category, tags, example_url, thumbnail_url, type, created_at'
+      'id, title, slug, prompt, category, tags, example_url, thumbnail_url, audio_preview_url, type, created_at'
     )
     .eq('is_public', true)
     .eq('is_pro', false)

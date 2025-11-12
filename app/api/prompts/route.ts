@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   let query = supabase
     .from('prompts')
     .select(
-      'id, title, slug, prompt, description, category, tags, created_at, example_url, thumbnail_url, model, type'
+      'id, title, slug, prompt, description, category, tags, created_at, example_url, thumbnail_url, audio_preview_url, model, type'
     )
     .order('created_at', { ascending: false });
 

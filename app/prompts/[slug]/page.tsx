@@ -3,6 +3,9 @@ import { notFound } from 'next/navigation';
 import WrapperClient from '@/app/WrapperClient';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import RelatedPromptsClient from './RelatedPromptsClient';
+import PromptDetailClient from './PromptDetailClient';
+import type { Metadata } from 'next';
+import { isImagePrompt } from '@/lib/utils/isImagePrompt';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,12 +14,6 @@ const fallbackOgImage = '/images/default-og.png';
 
 function resolveTitle(title?: string | null) {
   return typeof title === 'string' && title.trim().length > 0 ? title.trim() : 'Unnamed Prompt';
-}
-
-function resolveDescription(description?: string | null) {
-  return typeof description === 'string' && description.trim().length > 5
-    ? description
-    : 'No description available.';
 }
 
 function resolveImageUrl(...urls: Array<string | null | undefined>) {
@@ -28,50 +25,87 @@ function resolveImageUrl(...urls: Array<string | null | undefined>) {
   return fallbackOgImage;
 }
 
-function resolveTags(tags?: string[] | null) {
+function resolveTags(tags?: string[] | null): string[] {
   if (Array.isArray(tags) && tags.length > 0) {
-    return tags;
+    return tags.filter(tag => tag && typeof tag === 'string' && tag.trim().length > 0);
   }
-  return ['untagged'];
+  return [];
 }
 
-export default async function PromptSlugPage({ params }: { params: { slug: string } }) {
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = getSupabaseServerClient();
+
+  const { data } = await supabase
+    .from('prompts')
+    .select('title, description')
+    .eq('slug', slug)
+    .maybeSingle();
+
+  return {
+    title: data?.title ? `${data.title} | On Point Prompt` : 'Prompt Not Found',
+    description: data?.description || 'Creative prompt from On Point Prompt.',
+  };
+}
+
+export default async function PromptSlugPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
   const supabase = getSupabaseServerClient();
 
   const { data: prompt, error } = await supabase
     .from('prompts')
     .select(
-      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, model, type'
+      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, audio_preview_url, model, type'
     )
-    .eq('slug', params.slug)
-    .single<PromptRow>();
+    .eq('slug', slug)
+    .maybeSingle<PromptRow>();
 
-  if (error || !prompt || !prompt.slug) {
+  // Debug: Log fetch result in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[PromptSlugPage] Fetch result:', {
+      slug,
+      found: !!prompt,
+      error: error?.message,
+      promptId: prompt?.id,
+      promptTitle: prompt?.title,
+    });
+  }
+
+  // Clean check: if prompt doesn't exist, show 404
+  if (!prompt) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('Prompt fetch error:', error);
+      console.warn('[PromptSlugPage] Prompt not found, calling notFound()', { slug });
     }
     notFound();
   }
 
   const safeTitle = resolveTitle(prompt.title);
-  const safeDescription = resolveDescription(prompt.description);
   const safeTags = resolveTags(prompt.tags);
   const ogImage = resolveImageUrl(prompt.thumbnail_url, prompt.example_url, `${siteUrl}/og.png`);
-
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[DB]', 'prompt_detail', {
-      slug: params.slug,
-      category: prompt.category,
-    });
-  }
-
   const canonicalUrl = `${siteUrl}/prompts/${prompt.slug}`;
+  
+  // Get description - filter out placeholder text
+  const description = prompt.description && 
+    typeof prompt.description === 'string' && 
+    prompt.description.trim() && 
+    !/no description available/i.test(prompt.description.trim())
+    ? prompt.description.trim()
+    : null;
 
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     name: safeTitle,
-    description: safeDescription,
+    description: description || 'Creative prompt from On Point Prompt.',
     url: canonicalUrl,
     image: ogImage,
     datePublished: prompt.created_at || undefined,
@@ -81,24 +115,7 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
 
   const content = (
     <>
-      <head>
-        <title>{`${safeTitle} | On Point Prompt`}</title>
-        <meta
-          name="description"
-          content={safeDescription}
-        />
-        <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:title" content={`${safeTitle} | On Point Prompt`} />
-        <meta
-          property="og:description"
-          content={safeDescription}
-        />
-        <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:image" content={ogImage || fallbackOgImage} />
-        <meta property="og:type" content="article" />
-      </head>
-
-      <div className="container mx-auto max-w-screen-lg px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 md:px-8 py-10 space-y-6">
         <script
           type="application/ld+json"
           suppressHydrationWarning
@@ -107,65 +124,39 @@ export default async function PromptSlugPage({ params }: { params: { slug: strin
           }}
         />
 
-        <header className="py-8">
-          <h1 className="text-4xl font-bold mb-8 text-white">{safeTitle}</h1>
-          <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
-            {safeDescription}
-          </p>
+        <header>
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{safeTitle}</h1>
+          {description && !/no description available/i.test(description.trim()) ? (
+            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mt-2">
+              {description.trim()}
+            </p>
+          ) : null}
         </header>
 
-        {prompt.prompt && (
-          <section className="py-8">
-            <h2 className="text-xl font-semibold mb-4 text-white">Prompt</h2>
-            <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-sm">
-              <pre className="text-gray-200 whitespace-pre-wrap text-base leading-relaxed mb-6">
-                {prompt.prompt}
-              </pre>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => navigator.clipboard.writeText(prompt.prompt ?? '')}
-                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm"
-                >
-                  Copy Prompt
-                </button>
-                {prompt.example_url && (
-                  <a
-                    href={prompt.example_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm text-center"
-                  >
-                    Open Example
-                  </a>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
+        <PromptDetailClient prompt={prompt} />
 
-        <section className="py-8">
-          <h2 className="text-xl font-semibold mb-4 text-white">Prompt Details</h2>
-          <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 shadow-sm text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-5 text-sm text-gray-600 dark:text-gray-400 space-y-1">
+          <p>
+            <strong className="text-gray-900 dark:text-white">Category:</strong>{' '}
+            {prompt.category || 'Uncategorised'}
+          </p>
+
+          {isImagePrompt(prompt.model, prompt.category, prompt.tags) && prompt.model ? (
             <p>
-              <span className="text-white font-medium">Category:</span>{' '}
-              {prompt.category || 'Uncategorised'}
+              <strong className="text-gray-900 dark:text-white">Model:</strong> {prompt.model}
             </p>
-            {prompt.model && (
-              <p className="mt-3">
-                <span className="text-white font-medium">Model:</span> {prompt.model}
-              </p>
-            )}
-            {safeTags.length > 0 && (
-              <p className="mt-3">
-                <span className="text-white font-medium">Tags:</span> {safeTags.join(', ')}
-              </p>
-            )}
-          </div>
-        </section>
+          ) : null}
+
+          {safeTags && safeTags.length > 0 && (
+            <p>
+              <strong className="text-gray-900 dark:text-white">Tags:</strong> {safeTags.join(', ')}
+            </p>
+          )}
+        </div>
 
         {prompt.category && (
-          <section className="py-8">
-            <h3 className="text-xl font-semibold mb-4 text-white">Related Prompts</h3>
+          <section className="pt-4">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Related Prompts</h3>
             <RelatedPromptsClient category={prompt.category} excludeSlug={prompt.slug} />
           </section>
         )}

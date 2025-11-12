@@ -58,6 +58,12 @@ export default function SearchBar({
       return;
     }
 
+    // Guard: Don't call onChange with empty query on prompt detail pages
+    // This prevents unwanted redirects to /browse
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/prompts/')) {
+      return;
+    }
+
     onChange?.(trimmed);
   }, [debouncedQuery, onChange, isControlled, value]);
 

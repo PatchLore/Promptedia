@@ -6,6 +6,18 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'kcuhjqhxlnlzuozqhwoa.supabase.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'onpointprompt.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.openai.com',
+      },
     ],
     unoptimized: false,
   },

@@ -9,11 +9,12 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.c
 export default async function PromptsPage({
   searchParams,
 }: {
-  searchParams?: { q?: string; category?: string };
+  searchParams?: Promise<{ q?: string; category?: string }>;
 }) {
   const supabase = getSupabaseServerClient();
-  const category = searchParams?.category || '';
-  const search = searchParams?.q || '';
+  const params = await searchParams;
+  const category = params?.category || '';
+  const search = params?.q || '';
   const queryParams = new URLSearchParams();
   if (search) {
     queryParams.set('q', search);

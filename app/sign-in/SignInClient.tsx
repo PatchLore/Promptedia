@@ -16,8 +16,13 @@ export default function SignInClient() {
       : 'https://www.onpointprompt.com');
 
   useEffect(() => {
+    // Only redirect if we're actually on the sign-in page
+    // Guard against running on other pages (e.g., prompt detail pages)
+    if (typeof window === 'undefined') return;
+    if (!window.location.pathname.includes('/sign-in')) return;
+
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
+      if (user && window.location.pathname.includes('/sign-in')) {
         router.push('/');
         router.refresh();
       }

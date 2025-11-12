@@ -2,6 +2,7 @@ import { buildPromptUrl } from '@/lib/slug';
 import WrapperClient from '@/app/WrapperClient';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import LazyBrowseClient from '@/components/LazyBrowseClient';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,14 +38,47 @@ const categoryContentMap: Record<string, { title: string; intro: string }> = {
   },
 };
 
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: Promise<{ search?: string; category?: string }>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const category = params?.category ?? 'all';
+  const normalizedCategory = category.toLowerCase();
+  const categoryCopy = categoryContentMap[normalizedCategory];
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+  const canonicalUrl = `${siteUrl}/browse`;
+
+  return {
+    title: categoryCopy ? `${categoryCopy.title} | On Point Prompt` : 'Browse Prompts | On Point Prompt',
+    description:
+      categoryCopy?.intro ||
+      'Search and filter AI prompts across art, music, writing, business, and coding categories.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: categoryCopy ? `${categoryCopy.title} | On Point Prompt` : 'Browse Prompts | On Point Prompt',
+      description:
+        categoryCopy?.intro ||
+        'Search and filter AI prompts across art, music, writing, business, and coding categories.',
+      url: canonicalUrl,
+      images: [`${siteUrl}/og.png`],
+      type: 'website',
+    },
+  };
+}
+
 export default async function BrowsePage({
   searchParams,
 }: {
-  searchParams?: { search?: string; category?: string };
+  searchParams?: Promise<{ search?: string; category?: string }>;
 }) {
   const supabase = getSupabaseServerClient();
-  const search = searchParams?.search ?? '';
-  const category = searchParams?.category ?? 'all';
+  const params = await searchParams;
+  const search = params?.search ?? '';
+  const category = params?.category ?? 'all';
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
   const baseUrl = siteUrl;
   const canonicalUrl = `${siteUrl}/browse`;
@@ -52,7 +86,7 @@ export default async function BrowsePage({
   let query = supabase
     .from('prompts')
     .select(
-      'id, title, slug, prompt, description, category, tags, created_at, example_url, thumbnail_url, type'
+      'id, title, slug, prompt, description, category, tags, created_at, example_url, thumbnail_url, audio_preview_url, type'
     )
     .eq('is_public', true)
     .eq('is_pro', false);
@@ -97,34 +131,6 @@ export default async function BrowsePage({
 
   const content = (
     <>
-      <head>
-        <title>{categoryCopy ? `${categoryCopy.title} | On Point Prompt` : 'Browse Prompts | On Point Prompt'}</title>
-        <meta
-          name="description"
-          content={
-            categoryCopy
-              ? categoryCopy.intro
-              : 'Search and filter AI prompts across art, music, writing, business, and coding categories.'
-          }
-        />
-        <link rel="canonical" href={canonicalUrl} />
-        <meta
-          property="og:title"
-          content={categoryCopy ? `${categoryCopy.title} | On Point Prompt` : 'Browse Prompts | On Point Prompt'}
-        />
-        <meta
-          property="og:description"
-          content={
-            categoryCopy
-              ? categoryCopy.intro
-              : 'Search and filter AI prompts across art, music, writing, business, and coding categories.'
-          }
-        />
-        <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:image" content={`${siteUrl}/og.png`} />
-        <meta property="og:type" content="website" />
-      </head>
-
       <div className="container mx-auto max-w-screen-lg px-4 py-8">
         <header className="py-8 space-y-4">
           <h1 className="text-4xl font-bold text-white">

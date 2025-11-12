@@ -2,13 +2,14 @@ import WrapperClient from '@/app/WrapperClient';
 import SearchPageClient from './SearchPageClient';
 
 type SearchPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string;
-  };
+  }>;
 };
 
-export default function SearchPage({ searchParams }: SearchPageProps) {
-  const initialQuery = searchParams?.q ?? '';
+export default async function SearchPage({ searchParams }: SearchPageProps) {
+  const params = await searchParams;
+  const initialQuery = params?.q ?? '';
 
   return (
     <WrapperClient>

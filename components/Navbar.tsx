@@ -14,6 +14,15 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : 'SSR';
+    console.log('[Navbar] Mounted', { pathname });
+    return () => {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : 'SSR';
+      console.log('[Navbar] Unmounted', { pathname });
+    };
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
 
     // Initial fetch
@@ -36,6 +45,10 @@ export default function Navbar() {
 
   const handleSearch = useCallback(
     (query: string) => {
+      // Guard: Don't redirect if we're on a prompt detail page
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/prompts/')) {
+        return;
+      }
       if (!query) {
         router.push('/browse');
         return;
