@@ -7,7 +7,7 @@ import AffiliateCTA from './AffiliateCTA';
 import OptimizedImage from './OptimizedImage';
 import { useAudioPreview } from '@/hooks/useAudioPreview';
 import { supabase } from '@/lib/supabase/client';
-import { isImagePrompt } from '@/lib/utils/isImagePrompt';
+import { isImagePrompt } from '@/lib/isImagePrompt';
 
 type PromptCardProps = {
   prompt: any;

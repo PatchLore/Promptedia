@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { isPublicRoute } from '@/lib/publicRoutes';
 import AuthButton from './AuthButton';
 import SearchBar from './SearchBar';
 
@@ -11,14 +12,15 @@ type User = NonNullable<Awaited<ReturnType<typeof supabase.auth.getUser>>['data'
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const pathname = typeof window !== 'undefined' ? window.location.pathname : 'SSR';
-    console.log('[Navbar] Mounted', { pathname });
+    const currentPathname = typeof window !== 'undefined' ? window.location.pathname : 'SSR';
+    console.log('[Navbar] Mounted', { pathname: currentPathname });
     return () => {
-      const pathname = typeof window !== 'undefined' ? window.location.pathname : 'SSR';
-      console.log('[Navbar] Unmounted', { pathname });
+      const currentPathname = typeof window !== 'undefined' ? window.location.pathname : 'SSR';
+      console.log('[Navbar] Unmounted', { pathname: currentPathname });
     };
   }, []);
 
@@ -45,18 +47,26 @@ export default function Navbar() {
 
   const handleSearch = useCallback(
     (query: string) => {
-      // Guard: Don't redirect if we're on a prompt detail page
-      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/prompts/')) {
-        return;
+      // Guard: Don't redirect if we're on a public route (packs, prompts detail, etc.)
+      if (pathname && isPublicRoute(pathname)) {
+        // Only redirect if there's actually a query to search
+        if (!query) {
+          return; // Stay on current page if no query
+        }
       }
+      
       if (!query) {
-        router.push('/browse');
+        // Only redirect to browse if not already on a public route
+        if (!pathname || !isPublicRoute(pathname)) {
+          router.push('/browse');
+        }
         return;
       }
+      
       const params = new URLSearchParams({ search: query });
       router.push(`/browse?${params.toString()}`);
     },
-    [router],
+    [router, pathname],
   );
 
   return (

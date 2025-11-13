@@ -5,7 +5,7 @@ import { getSupabaseServerClient } from '@/lib/supabase/server';
 import RelatedPromptsClient from './RelatedPromptsClient';
 import PromptDetailClient from './PromptDetailClient';
 import type { Metadata } from 'next';
-import { isImagePrompt } from '@/lib/utils/isImagePrompt';
+import { isImagePrompt } from '@/lib/isImagePrompt';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,10 +94,9 @@ export default async function PromptSlugPage({
   const canonicalUrl = `${siteUrl}/prompts/${prompt.slug}`;
   
   // Get description - filter out placeholder text
-  const description = prompt.description && 
-    typeof prompt.description === 'string' && 
-    prompt.description.trim() && 
-    !/no description available/i.test(prompt.description.trim())
+  const description = prompt.description &&
+    !/no description available/i.test(prompt.description) &&
+    prompt.description.trim()
     ? prompt.description.trim()
     : null;
 
@@ -126,11 +125,12 @@ export default async function PromptSlugPage({
 
         <header>
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{safeTitle}</h1>
-          {description && !/no description available/i.test(description.trim()) ? (
-            <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mt-2">
-              {description.trim()}
-            </p>
-          ) : null}
+          {prompt.description &&
+            !/no description available/i.test(prompt.description) && (
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mt-2">
+                {prompt.description}
+              </p>
+            )}
         </header>
 
         <PromptDetailClient prompt={prompt} />
@@ -141,10 +141,8 @@ export default async function PromptSlugPage({
             {prompt.category || 'Uncategorised'}
           </p>
 
-          {isImagePrompt(prompt.model, prompt.category, prompt.tags) && prompt.model ? (
-            <p>
-              <strong className="text-gray-900 dark:text-white">Model:</strong> {prompt.model}
-            </p>
+          {isImagePrompt(prompt.model, prompt.category, prompt.tags) ? (
+            <p><strong>Model:</strong> {prompt.model}</p>
           ) : null}
 
           {safeTags && safeTags.length > 0 && (

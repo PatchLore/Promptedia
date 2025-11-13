@@ -58,10 +58,14 @@ export default function SearchBar({
       return;
     }
 
-    // Guard: Don't call onChange with empty query on prompt detail pages
-    // This prevents unwanted redirects to /browse
-    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/prompts/')) {
-      return;
+    // Guard: Don't call onChange with empty query on public pages
+    // This prevents unwanted redirects
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      // Don't trigger onChange on public pages if query is empty
+      if (!trimmed && (pathname.startsWith('/prompts/') || pathname === '/packs' || pathname === '/browse')) {
+        return;
+      }
     }
 
     onChange?.(trimmed);

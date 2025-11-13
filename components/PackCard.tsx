@@ -4,7 +4,18 @@ import Link from 'next/link';
 import { PromptPack } from '@/lib/monetization';
 import posthog from 'posthog-js';
 
-export default function PackCard({ pack }: { pack: PromptPack }) {
+type PackCardProps = {
+  pack: PromptPack | {
+    id?: string;
+    slug: string;
+    title: string;
+    summary: string;
+    price: string;
+    url: string;
+  };
+};
+
+export default function PackCard({ pack }: PackCardProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition-transform duration-300 ease-out hover:scale-105 overflow-hidden h-full flex flex-col">
       <div className="p-5 flex flex-col gap-3 flex-grow">

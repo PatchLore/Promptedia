@@ -313,7 +313,7 @@ export default function SearchPageClient({ initialQuery = '' }: SearchPageClient
     const trimmed = debouncedQuery.trim();
     if (trimmed.length < 2) return null;
     const params = new URLSearchParams({ limit: '200', q: trimmed });
-    return `/api/prompts?${params.toString()}`;
+    return `/api/search?${params.toString()}`;
   }, [debouncedQuery]);
 
   const { data, isLoading, error } = useSWR(apiKey, fetcher, {
@@ -326,7 +326,8 @@ export default function SearchPageClient({ initialQuery = '' }: SearchPageClient
     if (debouncedQuery.trim().length < 2) {
       return sortByTrending(data.prompts ?? []);
     }
-    return rankPrompts(data.prompts ?? [], debouncedQuery, { limit: 60, threshold: 0.5 });
+    // Results are already ranked by the API, just return them
+    return data.prompts ?? [];
   }, [data, debouncedQuery]);
 
   const showGrid = debouncedQuery.trim().length >= 2;
