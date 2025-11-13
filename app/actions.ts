@@ -212,7 +212,7 @@ export async function updatePrompt(id: string, fields: PromptUpdate): Promise<Pr
     .update(updatePayload)
     .eq('id', id)
     .select(
-      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, model, type, is_public, is_pro'
+      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, image_url, model, type, is_public, is_pro'
     )
     .single<PromptRow>();
 

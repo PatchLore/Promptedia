@@ -4,13 +4,16 @@ import WrapperClient from '@/app/WrapperClient';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import RelatedPromptsClient from './RelatedPromptsClient';
 import PromptDetailClient from './PromptDetailClient';
+import { getImageUrl } from '@/lib/getImageUrl';
 import type { Metadata } from 'next';
 import { isImagePrompt } from '@/lib/isImagePrompt';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
-const fallbackOgImage = '/images/default-og.png';
+// Default OG image should be uploaded to Supabase Storage branding bucket
+const DEFAULT_OG_IMAGE = process.env.NEXT_PUBLIC_DEFAULT_OG_IMAGE || getImageUrl();
 
 function resolveTitle(title?: string | null) {
   return typeof title === 'string' && title.trim().length > 0 ? title.trim() : 'Unnamed Prompt';
@@ -22,7 +25,7 @@ function resolveImageUrl(...urls: Array<string | null | undefined>) {
       return url;
     }
   }
-  return fallbackOgImage;
+  return DEFAULT_OG_IMAGE;
 }
 
 function resolveTags(tags?: string[] | null): string[] {
@@ -64,7 +67,7 @@ export default async function PromptSlugPage({
   const { data: prompt, error } = await supabase
     .from('prompts')
     .select(
-      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, audio_preview_url, model, type'
+      'id, title, slug, prompt, description, category, tags, created_at, updated_at, example_url, thumbnail_url, image_url, audio_preview_url, model, type'
     )
     .eq('slug', slug)
     .maybeSingle<PromptRow>();
@@ -90,7 +93,7 @@ export default async function PromptSlugPage({
 
   const safeTitle = resolveTitle(prompt.title);
   const safeTags = resolveTags(prompt.tags);
-  const ogImage = resolveImageUrl(prompt.thumbnail_url, prompt.example_url, `${siteUrl}/og.png`);
+  const ogImage = resolveImageUrl((prompt as any).image_url, prompt.thumbnail_url, prompt.example_url);
   const canonicalUrl = `${siteUrl}/prompts/${prompt.slug}`;
   
   // Get description - filter out placeholder text
@@ -132,6 +135,19 @@ export default async function PromptSlugPage({
               </p>
             )}
         </header>
+
+        {(prompt as any).image_url && (
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg">
+            <Image
+              src={(prompt as any).image_url}
+              alt={safeTitle}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 1200px"
+              priority
+            />
+          </div>
+        )}
 
         <PromptDetailClient prompt={prompt} />
 

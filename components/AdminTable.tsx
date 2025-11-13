@@ -5,6 +5,7 @@ import { updatePrompt, deletePrompt } from '@/app/actions';
 import { useToast } from './ToastProvider';
 import Image from 'next/image';
 import UnsplashImageButton from './UnsplashImageButton';
+import ImageUploader from './admin/ImageUploader';
 import { PromptRow } from '@/lib/supabase/client';
 
 type AdminTableProps = {
@@ -25,6 +26,8 @@ export default function AdminTable({ prompts: initialPrompts }: AdminTableProps)
       category: prompt.category,
       type: prompt.type,
       example_url: prompt.example_url,
+      thumbnail_url: prompt.thumbnail_url,
+      image_url: (prompt as any).image_url || null,
       is_pro: prompt.is_pro,
       is_public: prompt.is_public,
       prompt: prompt.prompt,
@@ -90,6 +93,7 @@ export default function AdminTable({ prompts: initialPrompts }: AdminTableProps)
             <th className="text-left py-3 px-4 font-semibold">Category</th>
             <th className="text-left py-3 px-4 font-semibold">Type</th>
             <th className="text-left py-3 px-4 font-semibold">Example URL</th>
+            <th className="text-left py-3 px-4 font-semibold">Preview Image</th>
             <th className="text-left py-3 px-4 font-semibold">Pro?</th>
             <th className="text-left py-3 px-4 font-semibold">Actions</th>
           </tr>
@@ -197,6 +201,53 @@ export default function AdminTable({ prompts: initialPrompts }: AdminTableProps)
                         </a>
                       ) : (
                         '-'
+                      )}
+                    </div>
+                  )}
+                </td>
+                <td className="py-3 px-4">
+                  {isEditing ? (
+                    <div className="space-y-2 min-w-[200px]">
+                      <ImageUploader
+                        bucketName="prompts"
+                        currentUrl={(editingFields as any).image_url || null}
+                        onUpload={(url) => {
+                          setEditingFields({ ...editingFields, image_url: url } as any);
+                        }}
+                        label=""
+                      />
+                      {(editingFields as any).image_url && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingFields({ ...editingFields, image_url: null } as any);
+                          }}
+                          className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition"
+                        >
+                          Remove Image
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="max-w-xs">
+                      {(prompt as any).image_url ? (
+                        <div className="space-y-1">
+                          <img
+                            src={(prompt as any).image_url}
+                            alt="Preview"
+                            className="w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-700"
+                          />
+                          <a
+                            href={(prompt as any).image_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 hover:underline block truncate"
+                          >
+                            View
+                          </a>
+                        </div>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
                       )}
                     </div>
                   )}
@@ -340,39 +391,65 @@ export default function AdminTable({ prompts: initialPrompts }: AdminTableProps)
                 </div>
 
                 {isEditing && (
-                  <div>
-                    <label className="text-xs text-gray-500 dark:text-gray-400">Example URL</label>
-                    <div className="space-y-2 mt-1">
-                      <div className="flex gap-2">
-                        <input
-                          type="url"
-                          value={editingFields.example_url || ''}
-                          onChange={(e) => setEditingFields({ ...editingFields, example_url: e.target.value })}
-                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-                          placeholder="https://..."
-                        />
-                        <UnsplashImageButton
-                          title={editingFields.title || ''}
-                          category={editingFields.category || ''}
-                          onImageSelected={(url) => {
-                            setEditingFields({ ...editingFields, example_url: url });
-                          }}
-                        />
-                      </div>
-                      {editingFields.example_url && editingFields.example_url.includes('unsplash.com') && (
-                        <div className="relative w-full h-32 rounded overflow-hidden border border-gray-200 dark:border-gray-700">
-                          <Image
-                            src={editingFields.example_url}
-                            alt="Preview"
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 300px"
-                            loading="lazy"
+                  <>
+                    <div>
+                      <label className="text-xs text-gray-500 dark:text-gray-400">Example URL</label>
+                      <div className="space-y-2 mt-1">
+                        <div className="flex gap-2">
+                          <input
+                            type="url"
+                            value={editingFields.example_url || ''}
+                            onChange={(e) => setEditingFields({ ...editingFields, example_url: e.target.value })}
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
+                            placeholder="https://..."
+                          />
+                          <UnsplashImageButton
+                            title={editingFields.title || ''}
+                            category={editingFields.category || ''}
+                            onImageSelected={(url) => {
+                              setEditingFields({ ...editingFields, example_url: url });
+                            }}
                           />
                         </div>
-                      )}
+                        {editingFields.example_url && editingFields.example_url.includes('unsplash.com') && (
+                          <div className="relative w-full h-32 rounded overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <Image
+                              src={editingFields.example_url}
+                              alt="Preview"
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 300px"
+                              loading="lazy"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                    <div>
+                      <label className="text-xs text-gray-500 dark:text-gray-400">Prompt Preview Image</label>
+                      <div className="space-y-2 mt-1">
+                        <ImageUploader
+                          bucketName="prompts"
+                          currentUrl={(editingFields as any).image_url || null}
+                          onUpload={(url) => {
+                            setEditingFields({ ...editingFields, image_url: url } as any);
+                          }}
+                          label=""
+                        />
+                        {(editingFields as any).image_url && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingFields({ ...editingFields, image_url: null } as any);
+                            }}
+                            className="px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
+                          >
+                            Remove Image
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 <div className="flex items-center gap-4">

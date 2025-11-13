@@ -10,6 +10,7 @@ export const publicRoutes = [
   '/search',
   '/sign-in',
   '/prompts/[slug]', // Dynamic route pattern
+  '/packs/[slug]', // Dynamic route pattern for pack detail pages
 ] as const;
 
 /**
@@ -23,6 +24,11 @@ export function isPublicRoute(pathname: string): boolean {
 
   // Check for dynamic routes
   if (pathname.startsWith('/prompts/')) {
+    return true;
+  }
+
+  // Check for pack detail routes
+  if (pathname.startsWith('/packs/')) {
     return true;
   }
 

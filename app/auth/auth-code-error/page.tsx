@@ -31,7 +31,7 @@ export default function AuthCodeError() {
             content="There was an error signing you in. Please try again."
           />
           <meta property="og:url" content={canonicalUrl} />
-          <meta property="og:image" content={`${siteUrl}/og.png`} />
+          <meta property="og:image" content={process.env.NEXT_PUBLIC_DEFAULT_OG_IMAGE || 'https://placehold.co/600x400?text=Image'} />
           <meta property="og:type" content="website" />
           <script
             type="application/ld+json"

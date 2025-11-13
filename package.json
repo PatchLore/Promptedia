@@ -13,7 +13,8 @@
     "fix:media": "node ./scripts/fix_prompt_media_urls.js",
     "clean:test-prompts": "node scripts/clean/remove-test-prompts.js",
     "clean:all-test-prompts": "node scripts/clean/remove-all-test-prompts.js",
-    "clean:verify": "node scripts/clean/verify-test-prompts-removed.js"
+    "clean:verify": "node scripts/clean/verify-test-prompts-removed.js",
+    "seed:packs": "tsx --tsconfig tsconfig.json scripts/seed-packs.ts"
   },
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.7",
@@ -44,6 +45,8 @@
     "@types/node": "^24.10.0",
     "dotenv": "^17.2.3",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.9.3"
   }
 }

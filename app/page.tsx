@@ -3,8 +3,12 @@ import Link from 'next/link';
 import WrapperClient from '@/app/WrapperClient';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import LazyPromptGrid from '@/components/LazyPromptGrid';
+import { getImageUrl } from '@/lib/getImageUrl';
 
 export const dynamic = 'force-dynamic';
+
+// Default OG image should be uploaded to Supabase Storage branding bucket
+const DEFAULT_OG_IMAGE = process.env.NEXT_PUBLIC_DEFAULT_OG_IMAGE || getImageUrl();
 
 export const metadata: Metadata = {
   title: 'OnPointPrompt — AI Prompts Library',
@@ -16,7 +20,7 @@ export const metadata: Metadata = {
     siteName: 'OnPointPrompt',
     images: [
       {
-        url: '/images/default-og.png',
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
         alt: 'OnPointPrompt — AI Prompts Library',

@@ -64,7 +64,7 @@ export async function generateMetadata({
         categoryCopy?.intro ||
         'Search and filter AI prompts across art, music, writing, business, and coding categories.',
       url: canonicalUrl,
-      images: [`${siteUrl}/og.png`],
+      images: [process.env.NEXT_PUBLIC_DEFAULT_OG_IMAGE || 'https://placehold.co/600x400?text=Image'],
       type: 'website',
     },
   };

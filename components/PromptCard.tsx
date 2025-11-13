@@ -8,6 +8,7 @@ import OptimizedImage from './OptimizedImage';
 import { useAudioPreview } from '@/hooks/useAudioPreview';
 import { supabase } from '@/lib/supabase/client';
 import { isImagePrompt } from '@/lib/isImagePrompt';
+import { getImageUrl } from '@/lib/getImageUrl';
 
 type PromptCardProps = {
   prompt: any;
@@ -61,13 +62,16 @@ export default function PromptCard({
   const rawTags = Array.isArray(prompt?.tags) ? prompt.tags : [];
   const safeTags = rawTags.length > 0 ? rawTags.filter((tag: any) => tag && typeof tag === 'string' && tag.trim().length > 0) : [];
 
+  // Only get image URL if a valid image exists (not placeholder paths)
   const safeImageUrl = useMemo(() => {
-    // Priority: art_url → thumbnail_url → example_url → placeholder
+    // Priority: image_url → art_url → thumbnail_url → example_url
+    // Only return if it's a valid HTTP URL (not placeholder paths)
+    if (isValidHttpUrl((prompt as any)?.image_url)) return (prompt as any).image_url;
     if (isValidHttpUrl(prompt?.art_url)) return prompt.art_url;
-    if (isValidHttpUrl(prompt?.thumbnail_url)) return prompt.thumbnail_url;
+    if (isValidHttpUrl(prompt?.thumbnail_url) && !prompt.thumbnail_url.includes('/images/placeholder')) return prompt.thumbnail_url;
     if (isValidHttpUrl(prompt?.example_url)) return prompt.example_url;
-    return '/images/placeholder.svg';
-  }, [prompt?.art_url, prompt?.thumbnail_url, prompt?.example_url]);
+    return null; // No image available
+  }, [(prompt as any)?.image_url, prompt?.art_url, prompt?.thumbnail_url, prompt?.example_url]);
 
   const audioUrl = isValidHttpUrl(prompt?.audio_preview_url) ? prompt.audio_preview_url : null;
 
@@ -115,13 +119,17 @@ export default function PromptCard({
     onRemoveFromCollection?.(safeId);
   };
 
-  const CategoryBadge = (
-    prompt?.category && (
-      <div className="absolute top-2 left-2 z-10 px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 dark:bg-black/60 text-gray-900 dark:text-white backdrop-blur pointer-events-none">
-        {getCategoryEmoji(prompt.category)} {prompt.category}
-      </div>
-    )
-  );
+  const CategoryBadgeContent = prompt?.category ? (
+    <div className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 dark:bg-black/60 text-gray-900 dark:text-white backdrop-blur pointer-events-none">
+      {getCategoryEmoji(prompt.category)} {prompt.category}
+    </div>
+  ) : null;
+
+  const CategoryBadgeAbsolute = prompt?.category ? (
+    <div className="absolute top-2 left-2 z-10 px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 dark:bg-black/60 text-gray-900 dark:text-white backdrop-blur pointer-events-none">
+      {getCategoryEmoji(prompt.category)} {prompt.category}
+    </div>
+  ) : null;
 
   const PreviewButton = (
     <button
@@ -187,58 +195,6 @@ export default function PromptCard({
 
   const CardContent = (
     <>
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-700">
-        {cardHref ? (
-          <Link 
-            href={cardHref} 
-            className="block h-full w-full relative z-0"
-            onClick={(e) => {
-              // Debug: Log click event
-              if (process.env.NODE_ENV === 'development') {
-                console.log('[PromptCard] Image Link clicked:', cardHref, 'slug:', safeSlug);
-              }
-              // Ensure click isn't blocked by buttons
-              const target = e.target as HTMLElement;
-              if (target.closest('button')) {
-                e.preventDefault();
-                e.stopPropagation();
-                return;
-              }
-            }}
-          >
-            <OptimizedImage
-              src={safeImageUrl}
-              alt={safeTitle}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105 pointer-events-none"
-              mode="card"
-            />
-          </Link>
-        ) : (
-          <OptimizedImage
-            src={safeImageUrl}
-            alt={safeTitle}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            mode="card"
-          />
-        )}
-
-        {/* Buttons with higher z-index to ensure they're clickable */}
-        {CategoryBadge}
-        {!showRemoveFromCollection && CollectionsButton}
-        {!showRemoveFromCollection && SaveButton}
-        {RemoveFromCollectionButton}
-        {PreviewButton}
-        {showAudioError && (
-          <div className="absolute left-3 right-20 bottom-3 text-xs font-medium text-red-300 bg-red-900/70 rounded-lg px-3 py-2 shadow">
-            {error}
-          </div>
-        )}
-      </div>
-
       <div className="p-4 flex-grow flex flex-col gap-3">
         <div className="space-y-2">
           {cardHref ? (
@@ -269,6 +225,63 @@ export default function PromptCard({
             </p>
           ) : null}
         </div>
+
+        {/* Small image preview - only show if image exists */}
+        {safeImageUrl && (
+          <div className="relative w-full h-32 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
+            {cardHref ? (
+              <Link 
+                href={cardHref} 
+                className="block h-full w-full relative z-0"
+                onClick={(e) => {
+                  const target = e.target as HTMLElement;
+                  if (target.closest('button')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                  }
+                }}
+              >
+                <OptimizedImage
+                  src={safeImageUrl}
+                  alt={safeTitle}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105 pointer-events-none"
+                  mode="card"
+                />
+              </Link>
+            ) : (
+              <OptimizedImage
+                src={safeImageUrl}
+                alt={safeTitle}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                mode="card"
+              />
+            )}
+            {/* Category badge on image */}
+            {CategoryBadgeAbsolute}
+            {/* Buttons on image */}
+            {!showRemoveFromCollection && CollectionsButton}
+            {!showRemoveFromCollection && SaveButton}
+            {RemoveFromCollectionButton}
+            {PreviewButton}
+            {showAudioError && (
+              <div className="absolute left-3 right-20 bottom-3 text-xs font-medium text-red-300 bg-red-900/70 rounded-lg px-3 py-2 shadow">
+                {error}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Category badge - show if no image */}
+        {!safeImageUrl && CategoryBadgeContent && (
+          <div className="flex items-center gap-2">
+            {CategoryBadgeContent}
+          </div>
+        )}
 
         {audioUrl && (
           <audio

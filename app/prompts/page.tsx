@@ -3,8 +3,22 @@ export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import WrapperClient from '@/app/WrapperClient';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import PromptCard from '@/components/PromptCard';
+import type { Metadata } from 'next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+
+export const metadata: Metadata = {
+  title: "All Prompts | OnPointPrompt",
+  description: "Browse all AI prompts across writing, art, music, coding, and more.",
+  openGraph: {
+    title: "All Prompts | OnPointPrompt",
+    description: "Browse the complete library of AI prompts across writing, art, coding, music, and business categories.",
+    url: `${siteUrl}/prompts`,
+    images: [process.env.NEXT_PUBLIC_DEFAULT_OG_IMAGE || 'https://placehold.co/600x400?text=Image'],
+    type: 'website',
+  },
+};
 
 export default async function PromptsPage({
   searchParams,
@@ -27,7 +41,7 @@ export default async function PromptsPage({
 
   let query = supabase
     .from('prompts')
-    .select('id, slug, title, description, category, created_at')
+    .select('id, title, slug, description, category, tags, image_url, thumbnail_url, example_url')
     .eq('is_public', true)
     .order('created_at', { ascending: false });
 
@@ -43,6 +57,9 @@ export default async function PromptsPage({
 
   const { data: prompts, error } = await query;
 
+  console.log('PROMPTS:', prompts);
+  console.log('ERROR:', error);
+
   if (process.env.NODE_ENV === 'development') {
     console.log('[DB]', 'prompts_index', {
       search,
@@ -51,35 +68,13 @@ export default async function PromptsPage({
     });
   }
 
-  const head = (
-    <head>
-      <title>All Prompts | On Point Prompt</title>
-      <meta
-        name="description"
-        content="Explore every AI prompt on On Point Prompt. Filter by category or keyword to find the perfect idea for ChatGPT, Midjourney, and more."
-      />
-      <link rel="canonical" href={canonicalUrl} />
-      <meta property="og:title" content="All Prompts | On Point Prompt" />
-      <meta
-        property="og:description"
-        content="Browse the complete library of AI prompts across writing, art, coding, music, and business categories."
-      />
-      <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:image" content={`${siteUrl}/og.png`} />
-      <meta property="og:type" content="website" />
-    </head>
-  );
-
   if (error) {
     console.error('Error fetching prompts:', error);
     return (
       <WrapperClient>
-        <>
-          {head}
-          <div className="container mx-auto max-w-screen-lg px-4 py-8 text-gray-400 dark:text-gray-300">
-            Error loading prompts.
-          </div>
-        </>
+        <div className="container mx-auto max-w-screen-lg px-4 py-8 text-gray-400 dark:text-gray-300">
+          Error loading prompts.
+        </div>
       </WrapperClient>
     );
   }
@@ -87,12 +82,9 @@ export default async function PromptsPage({
   if (!prompts?.length) {
     return (
       <WrapperClient>
-        <>
-          {head}
-          <div className="container mx-auto max-w-screen-lg px-4 py-8 text-gray-400 dark:text-gray-300">
-            No prompts found.
-          </div>
-        </>
+        <div className="container mx-auto max-w-screen-lg px-4 py-8 text-gray-400 dark:text-gray-300">
+          No prompts found.
+        </div>
       </WrapperClient>
     );
   }
@@ -108,21 +100,18 @@ export default async function PromptsPage({
       '@type': 'CreativeWork',
       name: prompt.title || 'Prompt',
       url: `${siteUrl}/prompts/${prompt.slug}`,
-      datePublished: prompt.created_at ? new Date(prompt.created_at).toISOString() : undefined,
     })),
   };
 
   const content = (
-    <>
-      {head}
-      <div className="container mx-auto max-w-screen-lg px-4 py-8">
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLdJson) }}
-        />
+    <div className="container mx-auto max-w-screen-lg px-4 py-8">
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLdJson) }}
+      />
 
-        <header className="py-8">
+      <header className="py-8">
           <h1 className="text-4xl font-bold mb-8 text-white">All Prompts</h1>
           <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
             Explore the entire library of AI prompts, and refine your results by category or keyword.
@@ -180,32 +169,11 @@ export default async function PromptsPage({
         <section className="py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {prompts.map((prompt) => (
-              <Link
-                key={prompt.slug}
-                href={`/prompts/${prompt.slug}`}
-                className="rounded-xl border border-gray-800 bg-gray-900/60 p-5 shadow-sm transition hover:bg-gray-900"
-              >
-                <h2 className="text-xl font-semibold mb-3 text-white line-clamp-2">
-                  {prompt.title}
-                </h2>
-
-                {prompt.description && (
-                  <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed line-clamp-3">
-                    {prompt.description}
-                  </p>
-                )}
-
-                <div className="mt-4 text-xs text-gray-400">
-                  <span className="rounded-md bg-gray-800 px-2 py-1 text-gray-300">
-                    {prompt.category || 'Uncategorised'}
-                  </span>
-                </div>
-              </Link>
+              <PromptCard key={prompt.id} prompt={prompt} />
             ))}
           </div>
         </section>
-      </div>
-    </>
+    </div>
   );
 
   return <WrapperClient>{content}</WrapperClient>;

@@ -17,7 +17,7 @@ export default async function AdminPage() {
   const { data: prompts, error } = await supabase
     .from('prompts')
     .select(
-      'id, title, slug, prompt, description, category, tags, type, example_url, audio_preview_url, thumbnail_url, model, is_public, is_pro, created_at, updated_at'
+      'id, title, slug, prompt, description, category, tags, type, example_url, audio_preview_url, thumbnail_url, image_url, model, is_public, is_pro, created_at, updated_at'
     )
     .order('created_at', { ascending: false });
 
@@ -54,7 +54,7 @@ export default async function AdminPage() {
           content="Moderate and manage prompts across the On Point Prompt catalog."
         />
         <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:image" content={`${siteUrl}/og.png`} />
+        <meta property="og:image" content={process.env.NEXT_PUBLIC_DEFAULT_OG_IMAGE || 'https://placehold.co/600x400?text=Image'} />
         <meta property="og:type" content="website" />
         <script
           type="application/ld+json"
@@ -72,12 +72,20 @@ export default async function AdminPage() {
                 Manage all prompts in the database
               </p>
             </div>
-            <Link
-              href="/create"
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
-            >
-              + New Prompt
-            </Link>
+            <div className="flex gap-3">
+              <Link
+                href="/admin/packs"
+                className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-md"
+              >
+                Manage Packs
+              </Link>
+              <Link
+                href="/create"
+                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
+              >
+                + New Prompt
+              </Link>
+            </div>
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
