@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useRadioStore } from '@/store/radioStore';
 import WrapperClient from '@/app/WrapperClient';
@@ -31,6 +31,7 @@ export default function RadioPage() {
     setIsSeeking,
   } = useRadioStore();
 
+  const [isShuffling, setIsShuffling] = useState(false);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
 
   // Initialize audio element if not already set in store
@@ -48,20 +49,33 @@ export default function RadioPage() {
     const track = playlist[currentTrackIndex];
     if (!track?.url) return;
 
+    // Set source and load properly to avoid AbortError
     audio.src = track.url;
+    audio.load();
     setCurrentTime(0);
     setDuration(0);
 
     if (isPlaying && track.url) {
-      audio
-        .play()
-        .then(() => {
-          useRadioStore.getState().play();
-        })
-        .catch((err) => {
-          console.error('Error playing audio:', err);
-          useRadioStore.getState().pause();
-        });
+      // Wait for audio to be ready before playing
+      const handleCanPlayThrough = () => {
+        audio
+          .play()
+          .then(() => {
+            useRadioStore.getState().play();
+          })
+          .catch((err) => {
+            console.error('Error playing audio:', err);
+            useRadioStore.getState().pause();
+          });
+        audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+      };
+
+      audio.addEventListener('canplaythrough', handleCanPlayThrough);
+      
+      // If already loaded, play immediately
+      if (audio.readyState >= 3) {
+        handleCanPlayThrough();
+      }
     }
   }, [currentTrackIndex, playlist, isPlaying, audioRef, setCurrentTime, setDuration]);
 
@@ -89,20 +103,67 @@ export default function RadioPage() {
     };
   }, [isSeeking, audioRef, setCurrentTime, setDuration]);
 
+  // Play random track (for shuffle mode)
+  const playRandomTrack = useCallback(() => {
+    if (playlist.length === 0) return;
+
+    const audio = audioRef;
+    if (!audio) return;
+
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * playlist.length);
+    } while (randomIndex === currentTrackIndex && playlist.length > 1);
+
+    const track = playlist[randomIndex];
+    if (!track?.url) return;
+
+    // Set source and load properly
+    audio.src = track.url;
+    audio.load();
+    // Update track index without calling setTrack (which would set src again)
+    useRadioStore.setState({ currentTrackIndex: randomIndex, currentTime: 0, duration: 0 });
+
+    // Wait for audio to be ready before playing
+    const handleCanPlayThrough = () => {
+      audio
+        .play()
+        .then(() => {
+          useRadioStore.getState().play();
+        })
+        .catch((err) => {
+          console.error('Error playing random track:', err);
+          useRadioStore.getState().pause();
+        });
+      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+    };
+
+    audio.addEventListener('canplaythrough', handleCanPlayThrough);
+    
+    // If already loaded, play immediately
+    if (audio.readyState >= 3) {
+      handleCanPlayThrough();
+    }
+  }, [playlist, currentTrackIndex, audioRef]);
+
   // Handle track ended event - auto-advance to next track
   useEffect(() => {
     const audio = audioRef;
     if (!audio) return;
 
     const handleEnded = () => {
-      next();
+      if (isShuffling) {
+        playRandomTrack();
+      } else {
+        next();
+      }
     };
 
     audio.addEventListener('ended', handleEnded);
     return () => {
       audio.removeEventListener('ended', handleEnded);
     };
-  }, [audioRef, next]);
+  }, [audioRef, next, isShuffling, playRandomTrack]);
 
   // Sync play/pause state with audio element
   useEffect(() => {
@@ -121,8 +182,38 @@ export default function RadioPage() {
 
   // Play specific track from playlist
   const playTrack = (index: number) => {
-    setTrack(index);
-    useRadioStore.getState().play();
+    const audio = audioRef;
+    if (!audio) return;
+
+    const track = playlist[index];
+    if (!track?.url) return;
+
+    // Set source and load properly
+    audio.src = track.url;
+    audio.load();
+    // Update track index without calling setTrack (which would set src again)
+    useRadioStore.setState({ currentTrackIndex: index, currentTime: 0, duration: 0 });
+
+    // Wait for audio to be ready before playing
+    const handleCanPlayThrough = () => {
+      audio
+        .play()
+        .then(() => {
+          useRadioStore.getState().play();
+        })
+        .catch((err) => {
+          console.error('Error playing track:', err);
+          useRadioStore.getState().pause();
+        });
+      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+    };
+
+    audio.addEventListener('canplaythrough', handleCanPlayThrough);
+    
+    // If already loaded, play immediately
+    if (audio.readyState >= 3) {
+      handleCanPlayThrough();
+    }
   };
 
   // Calculate progress percentage
@@ -260,6 +351,17 @@ export default function RadioPage() {
               className="px-6 py-3 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Next track
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsShuffling(!isShuffling)}
+              className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
+                isShuffling
+                  ? 'bg-indigo-600 text-white dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+            >
+              Shuffle
             </button>
           </div>
 

@@ -76,10 +76,11 @@ export const useRadioStore = create<RadioState>((set, get) => ({
   },
 
   next: () => {
-    const { currentTrackIndex, playlist, setTrack, play } = get();
+    const { currentTrackIndex, playlist, setTrack, isPlaying } = get();
     const nextIndex = currentTrackIndex + 1 >= playlist.length ? 0 : currentTrackIndex + 1;
     setTrack(nextIndex);
-    play();
+    // Don't call play() here - let the useEffect in the component handle playback
+    // after the audio source is loaded via canplaythrough event
   },
 
   setTrack: (index) => {
@@ -88,6 +89,7 @@ export const useRadioStore = create<RadioState>((set, get) => ({
 
     if (audioRef) {
       audioRef.src = playlist[index].url;
+      audioRef.load(); // Load the new source to avoid AbortError
     }
     set({ currentTrackIndex: index, currentTime: 0, duration: 0 });
   },
