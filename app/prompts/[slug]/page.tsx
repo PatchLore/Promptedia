@@ -44,15 +44,51 @@ export async function generateMetadata({
   const { slug } = await params;
   const supabase = getSupabaseServerClient();
 
-  const { data } = await supabase
+  const { data: prompt } = await supabase
     .from('prompts')
-    .select('title, description')
+    .select('title, slug, description, category, thumbnail_url, image_url, example_url')
     .eq('slug', slug)
     .maybeSingle();
 
+  if (!prompt) {
+    return {
+      title: 'Prompt Not Found | OnPointPrompt',
+      description: 'This AI prompt could not be found.',
+    };
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.onpointprompt.com';
+  const ogImage = prompt.image_url || prompt.thumbnail_url || prompt.example_url || DEFAULT_OG_IMAGE;
+  const description = prompt.description && !/no description available/i.test(prompt.description)
+    ? prompt.description.trim()
+    : `Explore the prompt: ${prompt.title}.`;
+
   return {
-    title: data?.title ? `${data.title} | On Point Prompt` : 'Prompt Not Found',
-    description: data?.description || 'Creative prompt from On Point Prompt.',
+    title: `${prompt.title} | AI Prompt`,
+    description: description,
+    alternates: {
+      canonical: `${baseUrl}/prompts/${prompt.slug}`,
+    },
+    openGraph: {
+      title: prompt.title,
+      description: description,
+      url: `${baseUrl}/prompts/${prompt.slug}`,
+      type: 'article',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: prompt.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: prompt.title,
+      description: description,
+      images: [ogImage],
+    },
   };
 }
 
@@ -110,6 +146,7 @@ export default async function PromptSlugPage({
     description: description || 'Creative prompt from On Point Prompt.',
     url: canonicalUrl,
     image: ogImage,
+    genre: prompt.category || undefined,
     datePublished: prompt.created_at || undefined,
     dateModified: prompt.updated_at || undefined,
     inLanguage: 'en',

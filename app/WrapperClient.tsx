@@ -20,7 +20,7 @@ export default function WrapperClient({ children }: { children: React.ReactNode 
     <PostHogProvider>
       <ToastProvider>
         <Navbar />
-        <main className="flex-grow">
+        <main className="flex-grow pb-20">
           {children}
         </main>
         <Footer />

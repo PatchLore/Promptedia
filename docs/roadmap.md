@@ -388,6 +388,261 @@ All data is community-maintained and usable under open licenses.
 - Strengthens long-term positioning in the AI music niche.
 
 ---
+
+## 🤖 OnPointPrompt – AI Expert Persona Library (Option B)
+
+**Status:** Planned  
+**Priority:** High  
+**Type:** Product Expansion + Retention Engine + Premium Monetization  
+**Phase:** v2.0–v2.5
+
+### Overview
+
+The AI Expert Persona Library introduces a new, high-value feature to OnPointPrompt: a collection of specialised AI assistants designed to provide expert-level guidance, advice, content, and problem-solving across a wide range of industries and use cases. Each persona is powered by advanced prompt engineering, curated knowledge structures, and unique personalities—making them feel like dedicated virtual specialists users can return to daily.
+
+This expands OnPointPrompt from a prompt discovery tool into a broader AI Productivity Ecosystem, offering built-in chat experiences, specialist workflows, and persona-driven automation.
+
+### 🎯 Core Purpose
+
+To allow users to select from a library of AI Specialist Personas—each with deep expertise in a specific field—and receive tailored responses, workflows, and actionable guidance.
+
+This creates a more immersive and results-focused experience than simply providing standalone prompts.
+
+### 🚀 Why This Fits OnPointPrompt
+
+- Leverages existing strength: prompt engineering expertise
+- Naturally extends the platform beyond static content
+- Increases daily active use
+- Provides recurring value through continuous chat interactions
+- Encourages upsells via premium personas and add-on modules
+- Aligns with creator-, business-, and productivity-focused audiences
+
+### 🧱 Core Features (MVP)
+
+#### 1. Persona Library Interface
+
+A clean grid of AI persona cards, each showing:
+
+- Name
+- Expertise area
+- Short tagline
+- Avatar
+- Category (Business, Creative, Writing, Trades, Wellness, etc.)
+
+Users click a persona → immediately open a dedicated chat page.
+
+#### 2. Persona-Specific System Prompts
+
+Each expert persona has:
+
+- A custom system prompt
+- A defined tone and personality
+- A set of core capabilities
+- Custom flows or mini-skills (e.g., SWOT analysis, SEO audits, ad copy tone presets)
+
+Stored in Supabase for dynamic updates.
+
+#### 3. Persona Chat UI
+
+Each expert has its own dedicated chat environment:
+
+- Avatar & colour theme
+- Suggested actions / quick prompts
+- Saved chat history (Pro feature)
+- Export conversation (PDF/notes)
+
+#### 4. Categories of Personas
+
+Initial categories include:
+
+**Business & Marketing**
+- Business Growth Mentor
+- Marketing Strategist
+- SEO Specialist
+- Sales Copywriter
+
+**Creative & Content**
+- YouTube Content Coach
+- Social Media Planner
+- Creative Director
+- Script Writer
+
+**Professional & Life**
+- Career Advisor
+- Productivity Coach
+- Mindset & Lifestyle AI
+- Therapist-Style Calm Guide
+
+**Technical**
+- Web Developer Helper
+- AI Automation Agent
+- UX/UI Consultant
+
+**Trades & Local Business**
+- Trades Business Advisor (ties in with FixBlox)
+- Local SEO Specialist
+- Google Business Profile Expert
+
+#### 5. Suggested Prompts
+
+Each persona page begins with:
+
+- Suggested questions
+- Task workflows
+- Scenario-based prompt buttons
+
+E.g., for Marketing Strategist:
+- "Create a content plan for my business"
+- "Write 5 Instagram captions"
+- "Analyse my brand tone"
+
+#### 6. Favourites & Collections
+
+Users can save:
+
+- Favourite personas
+- Favourite conversations
+- Favourite prompts from within a persona
+
+(Pro-tier unlocking)
+
+### 🔥 Extended Features (Phase 2+)
+
+#### 1. Voice Mode
+
+Users can speak with personas in real time (OpenAI Realtime API).
+
+#### 2. Persona Packs
+
+Sell bundles such as:
+
+- "Creator Pack"
+- "Entrepreneur Pack"
+- "Agency Pack"
+- "Trades Pack"
+
+#### 3. Custom User Personas
+
+Users create and publish their own personas for others to use.
+
+#### 4. Marketplace
+
+Creators sell premium personas.
+
+OnPointPrompt takes a revenue cut (10–30%).
+
+#### 5. Task Automations
+
+Each persona can:
+
+- Generate content
+- Analyse files
+- Produce reports
+- Export templates
+- Create step-by-step plans
+
+#### 6. Multi-Agent Mode
+
+Users can have two or more personas interact to solve complex problems collaboratively (e.g., "SEO Expert + Copywriter + Social Strategist").
+
+### 🧩 Technical Architecture (MVP)
+
+#### Database Tables
+
+**`personas`**
+- `id` (uuid)
+- `name` (text)
+- `avatar_url` (text)
+- `description` (text)
+- `system_prompt` (text)
+- `categories` (text[])
+- `is_premium` (boolean)
+- `personality_style` (text)
+- `created_at` (timestamp)
+
+**`persona_sessions`**
+- `id` (uuid)
+- `user_id` (uuid, references users)
+- `persona_id` (uuid, references personas)
+- `messages` (jsonb array)
+- `created_at` (timestamp)
+- `updated_at` (timestamp)
+
+**`persona_messages`**
+- `id` (uuid)
+- `session_id` (uuid, references persona_sessions)
+- `role` (text: user/ai/system)
+- `content` (text)
+- `timestamp` (timestamp)
+
+### 🛠️ Development Phases
+
+#### Phase 1 — Prototype (3–5 days)
+
+- Persona DB + seeds
+- Persona list page
+- Persona chat UI
+- Basic OpenAI integration
+- Session saving
+- Suggested prompts
+
+#### Phase 2 — Productisation (1–2 weeks)
+
+- Add categories
+- Add Pro personas
+- Add saved histories
+- Add favourites
+- Add improved UI/UX
+- Deploy & test
+
+#### Phase 3 — Expansion (1–2 months)
+
+- Voice mode
+- File uploads
+- Marketplace
+- Cross-persona collaboration
+- Advanced workflow tools
+- Mobile optimisation
+
+### 💰 Monetisation Model
+
+**Free tier**
+- 5 basic personas
+- Limited chats
+- No voice mode
+- No saved history
+
+**Pro (£9–£19/mo)**
+- Unlimited personas
+- All categories
+- Save chats
+- Export content
+- Priority AI model
+- Premium persona access
+
+**Creator Pro (£29–£49/mo)**
+- Create your own personas
+- Access marketplace tools
+- Custom branding
+- Higher model limits
+
+### 🎯 Strategic Importance
+
+This feature:
+
+- Raises OnPointPrompt's retention dramatically
+- Elevates the brand from a prompt library → AI assistant powerhouse
+- Differentiates from competitors
+- Opens new revenue channels
+- Integrates perfectly with your other apps (FixBlox, Soundswoop, AI Shorts Generator)
+
+It positions OnPointPrompt as a core daily-use AI workspace, not just a browsing site.
+
+### 🚀 Final Summary
+
+The AI Expert Persona Library transforms OnPointPrompt into a full suite of specialised AI assistants. It enhances user value, increases daily engagement, opens premium monetisation paths, and creates a long-term scalable ecosystem. After building the fast, viral "AI Conversation Video Generator" as a separate project, this Expert Persona system becomes the natural next evolution of OnPointPrompt.
+
+---
 ## 💰 Monetization Path (v2.0)
 
 | Tier | Features |

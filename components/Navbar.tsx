@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { isPublicRoute } from '@/lib/publicRoutes';
@@ -69,50 +69,91 @@ export default function Navbar() {
     [router, pathname],
   );
 
+  // Helper function to check if a route is active
+  const isActive = (href: string) => {
+    if (!pathname) return false;
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
+
+  // Nav link component with active state
+  const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
+    const active = isActive(href);
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+      // Ensure navigation works correctly, especially for /radio
+      if (href === '/radio') {
+        e.stopPropagation();
+      }
+    };
+    return (
+      <Link
+        href={href}
+        prefetch={true}
+        onClick={handleClick}
+        className={`text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors underline-offset-4 hover:underline inline-flex items-center ${
+          active
+            ? 'text-gray-900 dark:text-white font-semibold underline'
+            : ''
+        }`}
+      >
+        {children}
+      </Link>
+    );
+  };
+
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          {/* Branding - Left aligned */}
+          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
             On Point Prompt
           </Link>
 
-          <div className="flex-1 max-w-md mx-8">
+          {/* Search Bar - Center */}
+          <div className="flex-1 max-w-md mx-8 hidden md:block">
             <SearchBar onChange={handleSearch} placeholder="Search the library..." />
           </div>
 
-          <div className="flex items-center gap-4">
-            <Link
-              href="/browse"
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Browse
-            </Link>
-            <Link
-              href="/packs"
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              Packs
-            </Link>
-            {user && (
-              <Link
-                href="/profile"
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              >
-                Favorites
-              </Link>
-            )}
-            {user ? (
-              <AuthButton user={user} />
-            ) : (
-              <Link
-                href="/sign-in"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-              >
-                Sign In
-              </Link>
-            )}
+          {/* Nav Links - Right side */}
+          <div className="flex items-center space-x-6">
+            {/* Desktop Nav Links */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <NavLink href="/prompts">Browse</NavLink>
+              <NavLink href="/browse">Categories</NavLink>
+              <NavLink href="/packs">Packs</NavLink>
+              <NavLink href="/radio">🎧 Radio</NavLink>
+              {user && <NavLink href="/profile">Favorites</NavLink>}
+            </nav>
+
+            {/* Mobile Search Icon - Show on mobile */}
+            <div className="md:hidden">
+              <SearchBar onChange={handleSearch} placeholder="Search..." />
+            </div>
+
+            {/* Auth Section */}
+            <div className="flex items-center">
+              {user ? (
+                <AuthButton user={user} />
+              ) : (
+                <Link
+                  href="/sign-in"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors text-sm font-medium"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Mobile Nav Links - Stacked below on mobile */}
+        <div className="md:hidden mt-4 pb-2 flex flex-wrap gap-4">
+          <NavLink href="/prompts">Browse</NavLink>
+          <NavLink href="/browse">Categories</NavLink>
+          <NavLink href="/packs">Packs</NavLink>
+          <NavLink href="/radio">🎧 Radio</NavLink>
+          {user && <NavLink href="/profile">Favorites</NavLink>}
         </div>
       </div>
     </nav>

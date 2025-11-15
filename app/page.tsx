@@ -160,7 +160,7 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
             <h2 className="text-xl font-semibold text-white">Featured Prompts</h2>
             <Link
-              href="/browse"
+              href="/prompts"
               className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm"
             >
               View All Prompts

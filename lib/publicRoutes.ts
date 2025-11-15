@@ -7,6 +7,7 @@ export const publicRoutes = [
   '/browse',
   '/prompts',
   '/packs',
+  '/radio',
   '/search',
   '/sign-in',
   '/prompts/[slug]', // Dynamic route pattern

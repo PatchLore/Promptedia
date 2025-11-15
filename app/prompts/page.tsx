@@ -104,7 +104,7 @@ export default async function PromptsPage({
   };
 
   const content = (
-    <div className="container mx-auto max-w-screen-lg px-4 py-8">
+    <main className="max-w-7xl mx-auto px-4 md:px-8 py-10">
       <script
         type="application/ld+json"
         suppressHydrationWarning
@@ -112,68 +112,68 @@ export default async function PromptsPage({
       />
 
       <header className="py-8">
-          <h1 className="text-4xl font-bold mb-8 text-white">All Prompts</h1>
-          <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
-            Explore the entire library of AI prompts, and refine your results by category or keyword.
-          </p>
-        </header>
+        <h1 className="text-4xl font-bold mb-8 text-white">All Prompts</h1>
+        <p className="text-gray-400 dark:text-gray-300 text-base leading-relaxed">
+          Explore the entire library of AI prompts, and refine your results by category or keyword.
+        </p>
+      </header>
 
-        <section className="py-8">
-          <div className="flex flex-wrap gap-3 mb-6">
-            {['Writing', 'Art', 'Coding', 'Business', 'Music'].map((cat) => {
-              const isActive = category === cat;
-              return (
-                <Link
-                  key={cat}
-                  href={`/prompts?category=${cat}`}
-                  className={`rounded-lg px-4 py-2 text-sm transition ${
-                    isActive
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'border border-gray-800 bg-gray-900/60 text-gray-300 hover:bg-gray-900'
-                  }`}
-                >
-                  {cat}
-                </Link>
-              );
-            })}
-
-            {category && (
+      <section className="py-8">
+        <div className="flex flex-wrap gap-3 mb-6">
+          {['Writing', 'Art', 'Coding', 'Business', 'Music'].map((cat) => {
+            const isActive = category === cat;
+            return (
               <Link
-                href="/prompts"
-                className="rounded-lg px-4 py-2 text-sm transition bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                key={cat}
+                href={`/prompts?category=${cat}`}
+                className={`rounded-lg px-4 py-2 text-sm transition ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'border border-gray-800 bg-gray-900/60 text-gray-300 hover:bg-gray-900'
+                }`}
               >
-                Clear
+                {cat}
               </Link>
-            )}
-          </div>
+            );
+          })}
 
-          <form method="get" className="flex flex-col gap-4 md:flex-row md:items-center">
-            {category && <input type="hidden" name="category" value={category} />}
-            <label className="sr-only" htmlFor="prompt-search">
-              Search prompts
-            </label>
-            <input
-              id="prompt-search"
-              type="text"
-              name="q"
-              placeholder="Search prompts..."
-              defaultValue={search}
-              className="flex-1 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600"
-            />
-            <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm">
-              Apply
-            </button>
-          </form>
-        </section>
+          {category && (
+            <Link
+              href="/prompts"
+              className="rounded-lg px-4 py-2 text-sm transition bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+            >
+              Clear
+            </Link>
+          )}
+        </div>
 
-        <section className="py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {prompts.map((prompt) => (
-              <PromptCard key={prompt.id} prompt={prompt} />
-            ))}
-          </div>
-        </section>
-    </div>
+        <form method="get" className="flex flex-col gap-4 md:flex-row md:items-center">
+          {category && <input type="hidden" name="category" value={category} />}
+          <label className="sr-only" htmlFor="prompt-search">
+            Search prompts
+          </label>
+          <input
+            id="prompt-search"
+            type="text"
+            name="q"
+            placeholder="Search prompts..."
+            defaultValue={search}
+            className="flex-1 rounded-lg border border-gray-800 bg-gray-900 px-4 py-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          />
+          <button type="submit" className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white shadow-sm">
+            Apply
+          </button>
+        </form>
+      </section>
+
+      <section className="py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {prompts.map((prompt) => (
+            <PromptCard key={prompt.id} prompt={prompt} />
+          ))}
+        </div>
+      </section>
+    </main>
   );
 
   return <WrapperClient>{content}</WrapperClient>;
